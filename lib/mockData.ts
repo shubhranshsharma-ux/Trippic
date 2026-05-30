@@ -1,0 +1,250 @@
+import { Trip, TravelStats } from './types';
+
+export const mockTrips: Trip[] = [
+  {
+    id: 'trip-kyoto',
+    destination: 'Kyoto, Japan',
+    country: 'Japan',
+    city: 'Kyoto',
+    startDate: '2024-03-28',
+    endDate: '2024-04-04',
+    heroPhotoUrl: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80',
+    photoCount: 24,
+    aiSummary: "You spent six unhurried days wandering Kyoto's ancient alleyways, where cherry blossoms drifted like pink snow over temple gates and lantern-lit teahouses. From the vermillion torii gates of Fushimi Inari at dawn to meditative afternoons in Arashiyama's bamboo groves, every moment felt like stepping through a living painting. It was a journey that moved at the pace of a slow bow — deliberate, graceful, and deeply felt.",
+    source: 'auto',
+    days: [
+      {
+        date: '2024-03-28',
+        locationName: 'Higashiyama, Kyoto',
+        photos: [
+          { id: 'k1', url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&q=80', takenAt: '2024-03-28T09:00:00', locationName: 'Higashiyama, Kyoto', lat: 35.0038, lng: 135.7785 },
+          { id: 'k2', url: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=80', takenAt: '2024-03-28T11:30:00', locationName: 'Higashiyama, Kyoto', lat: 35.0038, lng: 135.7785 },
+          { id: 'k3', url: 'https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=600&q=80', takenAt: '2024-03-28T14:00:00', locationName: 'Higashiyama, Kyoto', lat: 35.0016, lng: 135.7788 },
+        ],
+      },
+      {
+        date: '2024-03-30',
+        locationName: 'Arashiyama, Kyoto',
+        photos: [
+          { id: 'k4', url: 'https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=600&q=80', takenAt: '2024-03-30T08:00:00', locationName: 'Arashiyama, Kyoto', lat: 35.0094, lng: 135.6727 },
+          { id: 'k5', url: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=600&q=80', takenAt: '2024-03-30T10:30:00', locationName: 'Arashiyama, Kyoto', lat: 35.0094, lng: 135.6727 },
+          { id: 'k6', url: 'https://images.unsplash.com/photo-1570459027562-4a916cc6113f?w=600&q=80', takenAt: '2024-03-30T13:00:00', locationName: 'Arashiyama, Kyoto', lat: 35.0094, lng: 135.6727 },
+        ],
+      },
+      {
+        date: '2024-04-02',
+        locationName: 'Fushimi Inari, Kyoto',
+        photos: [
+          { id: 'k7', url: 'https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=600&q=80', takenAt: '2024-04-02T06:30:00', locationName: 'Fushimi Inari, Kyoto', lat: 34.9671, lng: 135.7727 },
+          { id: 'k8', url: 'https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=600&q=80', takenAt: '2024-04-02T09:00:00', locationName: 'Fushimi Inari, Kyoto', lat: 34.9671, lng: 135.7727 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'trip-lisbon',
+    destination: 'Lisbon, Portugal',
+    country: 'Portugal',
+    city: 'Lisbon',
+    startDate: '2023-10-10',
+    endDate: '2023-10-15',
+    heroPhotoUrl: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80',
+    photoCount: 18,
+    aiSummary: "You gave yourself five glorious days to get lost in Lisbon's sun-drenched hills, trailing yellow trams up cobblestone streets that smelled of salt, grilled fish, and pastéis de nata. Alfama's fado drifted from open windows at dusk while the Tagus shimmered gold below Castelo de São Jorge. You left with aching calves, a full heart, and the unshakeable feeling you'd lived a whole other life for a week.",
+    source: 'auto',
+    days: [
+      {
+        date: '2023-10-10',
+        locationName: 'Alfama, Lisbon',
+        photos: [
+          { id: 'l1', url: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=600&q=80', takenAt: '2023-10-10T10:00:00', locationName: 'Alfama, Lisbon', lat: 38.7139, lng: -9.1334 },
+          { id: 'l2', url: 'https://images.unsplash.com/photo-1588928492777-3a2e1fcab68d?w=600&q=80', takenAt: '2023-10-10T13:00:00', locationName: 'Alfama, Lisbon', lat: 38.7139, lng: -9.1334 },
+          { id: 'l3', url: 'https://images.unsplash.com/photo-1513735492246-483525079686?w=600&q=80', takenAt: '2023-10-10T16:00:00', locationName: 'Alfama, Lisbon', lat: 38.7139, lng: -9.1334 },
+        ],
+      },
+      {
+        date: '2023-10-12',
+        locationName: 'Belém, Lisbon',
+        photos: [
+          { id: 'l4', url: 'https://images.unsplash.com/photo-1548707309-dcebeab9ea9b?w=600&q=80', takenAt: '2023-10-12T09:00:00', locationName: 'Belém, Lisbon', lat: 38.6972, lng: -9.2066 },
+          { id: 'l5', url: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=600&q=80', takenAt: '2023-10-12T11:30:00', locationName: 'Belém, Lisbon', lat: 38.6972, lng: -9.2066 },
+        ],
+      },
+      {
+        date: '2023-10-14',
+        locationName: 'Sintra, Portugal',
+        photos: [
+          { id: 'l6', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80', takenAt: '2023-10-14T10:00:00', locationName: 'Sintra, Portugal', lat: 38.7978, lng: -9.3905 },
+          { id: 'l7', url: 'https://images.unsplash.com/photo-1596394723269-b2cbca4e3b47?w=600&q=80', takenAt: '2023-10-14T13:00:00', locationName: 'Sintra, Portugal', lat: 38.7978, lng: -9.3905 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'trip-reykjavik',
+    destination: 'Reykjavik, Iceland',
+    country: 'Iceland',
+    city: 'Reykjavik',
+    startDate: '2024-01-15',
+    endDate: '2024-01-20',
+    heroPhotoUrl: 'https://images.unsplash.com/photo-1531168556467-80aace0d0144?w=800&q=80',
+    photoCount: 31,
+    aiSummary: "You chased the northern lights across five frozen nights in Iceland, trading warmth for wonder as curtains of green and violet fire danced above volcanic black sand beaches. Days were spent soaking in the Blue Lagoon's ethereal mist, exploring Reykjavik's colourful streets, and driving the Golden Circle in a near-perpetual sunset. It was cold, surreal, and utterly unforgettable — the kind of trip that recalibrates your sense of what's possible on this planet.",
+    source: 'auto',
+    days: [
+      {
+        date: '2024-01-15',
+        locationName: 'Reykjavik City Centre',
+        photos: [
+          { id: 'r1', url: 'https://images.unsplash.com/photo-1531168556467-80aace0d0144?w=600&q=80', takenAt: '2024-01-15T12:00:00', locationName: 'Reykjavik City Centre', lat: 64.1466, lng: -21.9426 },
+          { id: 'r2', url: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=600&q=80', takenAt: '2024-01-15T14:00:00', locationName: 'Reykjavik City Centre', lat: 64.1466, lng: -21.9426 },
+          { id: 'r3', url: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=600&q=80', takenAt: '2024-01-15T20:00:00', locationName: 'Reykjavik City Centre', lat: 64.1466, lng: -21.9426 },
+        ],
+      },
+      {
+        date: '2024-01-17',
+        locationName: 'Blue Lagoon, Iceland',
+        photos: [
+          { id: 'r4', url: 'https://images.unsplash.com/photo-1515859005217-8a1f08870f59?w=600&q=80', takenAt: '2024-01-17T10:00:00', locationName: 'Blue Lagoon, Iceland', lat: 63.8799, lng: -22.4490 },
+          { id: 'r5', url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80', takenAt: '2024-01-17T12:00:00', locationName: 'Blue Lagoon, Iceland', lat: 63.8799, lng: -22.4490 },
+        ],
+      },
+      {
+        date: '2024-01-19',
+        locationName: 'Golden Circle, Iceland',
+        photos: [
+          { id: 'r6', url: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=600&q=80', takenAt: '2024-01-19T09:00:00', locationName: 'Golden Circle, Iceland', lat: 64.3271, lng: -20.1199 },
+          { id: 'r7', url: 'https://images.unsplash.com/photo-1531168556467-80aace0d0144?w=600&q=80', takenAt: '2024-01-19T13:00:00', locationName: 'Golden Circle, Iceland', lat: 64.3271, lng: -20.1199 },
+          { id: 'r8', url: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=600&q=80', takenAt: '2024-01-19T16:00:00', locationName: 'Golden Circle, Iceland', lat: 64.3271, lng: -20.1199 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'trip-marrakesh',
+    destination: 'Marrakesh, Morocco',
+    country: 'Morocco',
+    city: 'Marrakesh',
+    startDate: '2023-05-04',
+    endDate: '2023-05-09',
+    heroPhotoUrl: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=800&q=80',
+    photoCount: 22,
+    aiSummary: "You plunged into Marrakesh for five days and emerged transformed, your senses permanently retuned by the medina's labyrinthine souks, the call to prayer echoing over rose-pink rooftops, and mint tea poured from impossible heights. Djemaa el-Fna square became your nightly theatre — acrobats, snake charmers, and storytellers performing under a sky scattered with stars. It was a place that refused to let you be a passive observer, and you were all the richer for it.",
+    source: 'auto',
+    days: [
+      {
+        date: '2023-05-04',
+        locationName: 'Djemaa el-Fna, Marrakesh',
+        photos: [
+          { id: 'm1', url: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=600&q=80', takenAt: '2023-05-04T11:00:00', locationName: 'Djemaa el-Fna, Marrakesh', lat: 31.6258, lng: -7.9892 },
+          { id: 'm2', url: 'https://images.unsplash.com/photo-1489493585363-d69421e0edd3?w=600&q=80', takenAt: '2023-05-04T14:00:00', locationName: 'Djemaa el-Fna, Marrakesh', lat: 31.6258, lng: -7.9892 },
+          { id: 'm3', url: 'https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80', takenAt: '2023-05-04T19:00:00', locationName: 'Djemaa el-Fna, Marrakesh', lat: 31.6258, lng: -7.9892 },
+        ],
+      },
+      {
+        date: '2023-05-06',
+        locationName: 'Medina Souks, Marrakesh',
+        photos: [
+          { id: 'm4', url: 'https://images.unsplash.com/photo-1577948000111-9c970dfe3743?w=600&q=80', takenAt: '2023-05-06T10:00:00', locationName: 'Medina Souks, Marrakesh', lat: 31.6320, lng: -7.9875 },
+          { id: 'm5', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80', takenAt: '2023-05-06T13:00:00', locationName: 'Medina Souks, Marrakesh', lat: 31.6320, lng: -7.9875 },
+        ],
+      },
+      {
+        date: '2023-05-08',
+        locationName: 'Majorelle Garden, Marrakesh',
+        photos: [
+          { id: 'm6', url: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=600&q=80', takenAt: '2023-05-08T09:30:00', locationName: 'Majorelle Garden, Marrakesh', lat: 31.6415, lng: -8.0040 },
+          { id: 'm7', url: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=600&q=80', takenAt: '2023-05-08T11:00:00', locationName: 'Majorelle Garden, Marrakesh', lat: 31.6415, lng: -8.0040 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'trip-tokyo',
+    destination: 'Tokyo, Japan',
+    country: 'Japan',
+    city: 'Tokyo',
+    startDate: '2024-04-10',
+    endDate: '2024-04-17',
+    heroPhotoUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80',
+    photoCount: 38,
+    aiSummary: "You threw yourself into Tokyo for eight electric days and barely scratched the surface — from the neon labyrinth of Shinjuku at 2am to the serene moss gardens of Yanaka at sunrise, the city contained multitudes you could spend a lifetime exploring. You ate your way through Tsukiji's outer market, got blissfully lost in Shimokitazawa's vintage alleyways, and stood speechless at the top of Skytree as 38 million lives glittered below you. Tokyo doesn't just meet your expectations — it quietly, devastatingly exceeds them.",
+    source: 'auto',
+    days: [
+      {
+        date: '2024-04-10',
+        locationName: 'Shinjuku, Tokyo',
+        photos: [
+          { id: 't1', url: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&q=80', takenAt: '2024-04-10T20:00:00', locationName: 'Shinjuku, Tokyo', lat: 35.6938, lng: 139.7034 },
+          { id: 't2', url: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=600&q=80', takenAt: '2024-04-10T22:00:00', locationName: 'Shinjuku, Tokyo', lat: 35.6938, lng: 139.7034 },
+        ],
+      },
+      {
+        date: '2024-04-12',
+        locationName: 'Shibuya, Tokyo',
+        photos: [
+          { id: 't3', url: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=600&q=80', takenAt: '2024-04-12T10:00:00', locationName: 'Shibuya, Tokyo', lat: 35.6595, lng: 139.7005 },
+          { id: 't4', url: 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=600&q=80', takenAt: '2024-04-12T14:00:00', locationName: 'Shibuya, Tokyo', lat: 35.6595, lng: 139.7005 },
+          { id: 't5', url: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&q=80', takenAt: '2024-04-12T18:00:00', locationName: 'Shibuya, Tokyo', lat: 35.6595, lng: 139.7005 },
+        ],
+      },
+      {
+        date: '2024-04-15',
+        locationName: 'Asakusa, Tokyo',
+        photos: [
+          { id: 't6', url: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=80', takenAt: '2024-04-15T08:00:00', locationName: 'Asakusa, Tokyo', lat: 35.7147, lng: 139.7966 },
+          { id: 't7', url: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=600&q=80', takenAt: '2024-04-15T11:00:00', locationName: 'Asakusa, Tokyo', lat: 35.7147, lng: 139.7966 },
+          { id: 't8', url: 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=600&q=80', takenAt: '2024-04-15T15:00:00', locationName: 'Asakusa, Tokyo', lat: 35.7147, lng: 139.7966 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'trip-barcelona',
+    destination: 'Barcelona, Spain',
+    country: 'Spain',
+    city: 'Barcelona',
+    startDate: '2023-07-20',
+    endDate: '2023-07-26',
+    heroPhotoUrl: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&q=80',
+    photoCount: 27,
+    aiSummary: "You spent seven sun-soaked days in Barcelona letting Gaudí's impossible architecture scramble your perception of what buildings could be — Sagrada Família alone was worth the flight. Afternoons dissolved in the Gothic Quarter's narrow lanes and on Barceloneta beach with a cold Estrella, while evenings began at 10pm and ended when the city finally, reluctantly, let you go. Spain got under your skin the way only places with great food, great light, and absolutely no interest in sleeping early ever do.",
+    source: 'auto',
+    days: [
+      {
+        date: '2023-07-20',
+        locationName: 'Gothic Quarter, Barcelona',
+        photos: [
+          { id: 'b1', url: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80', takenAt: '2023-07-20T11:00:00', locationName: 'Gothic Quarter, Barcelona', lat: 41.3833, lng: 2.1768 },
+          { id: 'b2', url: 'https://images.unsplash.com/photo-1464790719320-516ecd75af6c?w=600&q=80', takenAt: '2023-07-20T14:00:00', locationName: 'Gothic Quarter, Barcelona', lat: 41.3833, lng: 2.1768 },
+        ],
+      },
+      {
+        date: '2023-07-22',
+        locationName: 'Sagrada Família, Barcelona',
+        photos: [
+          { id: 'b3', url: 'https://images.unsplash.com/photo-1583779457094-ab6f77f7bf57?w=600&q=80', takenAt: '2023-07-22T09:00:00', locationName: 'Sagrada Família, Barcelona', lat: 41.4036, lng: 2.1744 },
+          { id: 'b4', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80', takenAt: '2023-07-22T11:30:00', locationName: 'Sagrada Família, Barcelona', lat: 41.4036, lng: 2.1744 },
+          { id: 'b5', url: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80', takenAt: '2023-07-22T14:00:00', locationName: 'Sagrada Família, Barcelona', lat: 41.4036, lng: 2.1744 },
+        ],
+      },
+      {
+        date: '2023-07-25',
+        locationName: 'Barceloneta Beach, Barcelona',
+        photos: [
+          { id: 'b6', url: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=600&q=80', takenAt: '2023-07-25T11:00:00', locationName: 'Barceloneta Beach, Barcelona', lat: 41.3795, lng: 2.1921 },
+          { id: 'b7', url: 'https://images.unsplash.com/photo-1548707309-dcebeab9ea9b?w=600&q=80', takenAt: '2023-07-25T15:00:00', locationName: 'Barceloneta Beach, Barcelona', lat: 41.3795, lng: 2.1921 },
+        ],
+      },
+    ],
+  },
+];
+
+export const mockStats: TravelStats = {
+  countries: 5,
+  continents: 4,
+  trips: 6,
+  cities: 6,
+  photos: 160,
+  miles: 38420,
+};
