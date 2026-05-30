@@ -1,13 +1,18 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Trip, TravelStats } from './types';
+import { Trip, TravelStats, TripDay } from './types';
 import { mockTrips, mockStats } from './mockData';
 
 interface TripsContextValue {
   trips: Trip[];
   stats: TravelStats;
   addTrip: (trip: Trip) => void;
+  deleteTrip: (id: string) => void;
+  toggleFavourite: (id: string) => void;
+  setHeroPhoto: (tripId: string, photoUrl: string) => void;
+  deletePhoto: (tripId: string, photoId: string) => void;
+  updateDay: (tripId: string, date: string, patch: Partial<Pick<TripDay, 'summary' | 'kmTravelled'>>) => void;
   useMock: boolean;
 }
 
@@ -22,8 +27,36 @@ export function TripsProvider({ children }: { children: ReactNode }) {
     setTrips(prev => [trip, ...prev]);
   }
 
+  function deleteTrip(id: string) {
+    setTrips(prev => prev.filter(t => t.id !== id));
+  }
+
+  function toggleFavourite(id: string) {
+    setTrips(prev => prev.map(t => t.id === id ? { ...t, isFavourite: !t.isFavourite } : t));
+  }
+
+  function setHeroPhoto(tripId: string, photoUrl: string) {
+    setTrips(prev => prev.map(t => t.id === tripId ? { ...t, heroPhotoUrl: photoUrl } : t));
+  }
+
+  function deletePhoto(tripId: string, photoId: string) {
+    setTrips(prev => prev.map(t => {
+      if (t.id !== tripId) return t;
+      const days = t.days.map(d => ({ ...d, photos: d.photos.filter(p => p.id !== photoId) }))
+        .filter(d => d.photos.length > 0);
+      return { ...t, days, photoCount: Math.max(0, t.photoCount - 1) };
+    }));
+  }
+
+  function updateDay(tripId: string, date: string, patch: Partial<Pick<TripDay, 'summary' | 'kmTravelled'>>) {
+    setTrips(prev => prev.map(t => {
+      if (t.id !== tripId) return t;
+      return { ...t, days: t.days.map(d => d.date === date ? { ...d, ...patch } : d) };
+    }));
+  }
+
   return (
-    <TripsContext.Provider value={{ trips, stats, addTrip, useMock }}>
+    <TripsContext.Provider value={{ trips, stats, addTrip, deleteTrip, toggleFavourite, setHeroPhoto, deletePhoto, updateDay, useMock }}>
       {children}
     </TripsContext.Provider>
   );

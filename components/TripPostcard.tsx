@@ -1,9 +1,11 @@
 'use client';
 
 import { Trip } from '@/lib/types';
-import { Camera, MapPin } from 'lucide-react';
+import { useTrips } from '@/lib/tripsContext';
+import { Camera, MapPin, Heart, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface Props {
   trip: Trip;
@@ -12,14 +14,30 @@ interface Props {
 function formatDateRange(start: string, end: string) {
   const s = new Date(start);
   const e = new Date(end);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const days = Math.round((e.getTime() - s.getTime()) / 86400000) + 1;
   return `${months[s.getMonth()]} ${s.getFullYear()} · ${days} day${days !== 1 ? 's' : ''}`;
 }
 
 export default function TripPostcard({ trip }: Props) {
   const router = useRouter();
+  const { toggleFavourite, deleteTrip } = useTrips();
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  function handleFav(e: React.MouseEvent) {
+    e.stopPropagation();
+    toggleFavourite(trip.id);
+  }
+
+  function handleDelete(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (confirmDelete) {
+      deleteTrip(trip.id);
+    } else {
+      setConfirmDelete(true);
+      setTimeout(() => setConfirmDelete(false), 2500);
+    }
+  }
 
   return (
     <div
@@ -36,9 +54,40 @@ export default function TripPostcard({ trip }: Props) {
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         {/* Photo count badge */}
-        <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+        <div className="absolute top-3 left-3 flex items-center gap-1 bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
           <Camera className="w-3 h-3" />
           {trip.photoCount}
+        </div>
+
+        {/* Action buttons */}
+        <div className="absolute top-2 right-2 flex gap-1.5">
+          {/* Favourite */}
+          <button
+            onClick={handleFav}
+            className={`w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition-all ${
+              trip.isFavourite
+                ? 'bg-rose-500 text-white shadow-md'
+                : 'bg-black/40 text-white/80 hover:bg-rose-500 hover:text-white'
+            }`}
+          >
+            <Heart className={`w-4 h-4 ${trip.isFavourite ? 'fill-current' : ''}`} />
+          </button>
+
+          {/* Delete */}
+          <button
+            onClick={handleDelete}
+            className={`h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition-all px-2 gap-1 ${
+              confirmDelete
+                ? 'bg-red-600 text-white text-xs font-medium'
+                : 'bg-black/40 text-white/80 hover:bg-red-600 hover:text-white w-8'
+            }`}
+          >
+            {confirmDelete ? (
+              <span>Confirm</span>
+            ) : (
+              <Trash2 className="w-4 h-4" />
+            )}
+          </button>
         </div>
       </div>
 

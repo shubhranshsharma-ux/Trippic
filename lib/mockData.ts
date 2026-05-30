@@ -10,12 +10,15 @@ export const mockTrips: Trip[] = [
     endDate: '2024-04-04',
     heroPhotoUrl: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80',
     photoCount: 24,
+    isFavourite: true,
     aiSummary: "You spent six unhurried days wandering Kyoto's ancient alleyways, where cherry blossoms drifted like pink snow over temple gates and lantern-lit teahouses. From the vermillion torii gates of Fushimi Inari at dawn to meditative afternoons in Arashiyama's bamboo groves, every moment felt like stepping through a living painting. It was a journey that moved at the pace of a slow bow — deliberate, graceful, and deeply felt.",
     source: 'auto',
     days: [
       {
         date: '2024-03-28',
         locationName: 'Higashiyama, Kyoto',
+        summary: 'Wandered the stone-paved lanes of Higashiyama, visited Kiyomizudera temple and browsed ceramic shops.',
+        kmTravelled: 8,
         photos: [
           { id: 'k1', url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&q=80', takenAt: '2024-03-28T09:00:00', locationName: 'Higashiyama, Kyoto', lat: 35.0038, lng: 135.7785 },
           { id: 'k2', url: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=80', takenAt: '2024-03-28T11:30:00', locationName: 'Higashiyama, Kyoto', lat: 35.0038, lng: 135.7785 },
@@ -25,6 +28,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2024-03-30',
         locationName: 'Arashiyama, Kyoto',
+        summary: 'Morning in the bamboo grove, boat ride on the Oi River, afternoon at Tenryu-ji garden.',
+        kmTravelled: 14,
         photos: [
           { id: 'k4', url: 'https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=600&q=80', takenAt: '2024-03-30T08:00:00', locationName: 'Arashiyama, Kyoto', lat: 35.0094, lng: 135.6727 },
           { id: 'k5', url: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=600&q=80', takenAt: '2024-03-30T10:30:00', locationName: 'Arashiyama, Kyoto', lat: 35.0094, lng: 135.6727 },
@@ -34,6 +39,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2024-04-02',
         locationName: 'Fushimi Inari, Kyoto',
+        summary: 'Pre-dawn hike through 10,000 torii gates to the summit; near-empty paths in the golden morning light.',
+        kmTravelled: 6,
         photos: [
           { id: 'k7', url: 'https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=600&q=80', takenAt: '2024-04-02T06:30:00', locationName: 'Fushimi Inari, Kyoto', lat: 34.9671, lng: 135.7727 },
           { id: 'k8', url: 'https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?w=600&q=80', takenAt: '2024-04-02T09:00:00', locationName: 'Fushimi Inari, Kyoto', lat: 34.9671, lng: 135.7727 },
@@ -56,6 +63,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2023-10-10',
         locationName: 'Alfama, Lisbon',
+        summary: 'Climbed to the castle, got pleasantly lost in the Alfama maze, caught live fado at a neighbourhood tasca.',
+        kmTravelled: 11,
         photos: [
           { id: 'l1', url: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=600&q=80', takenAt: '2023-10-10T10:00:00', locationName: 'Alfama, Lisbon', lat: 38.7139, lng: -9.1334 },
           { id: 'l2', url: 'https://images.unsplash.com/photo-1588928492777-3a2e1fcab68d?w=600&q=80', takenAt: '2023-10-10T13:00:00', locationName: 'Alfama, Lisbon', lat: 38.7139, lng: -9.1334 },
@@ -65,6 +74,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2023-10-12',
         locationName: 'Belém, Lisbon',
+        summary: 'Visited the Tower of Belém and Jerónimos Monastery; ate the original pastel de nata at Pastéis de Belém.',
+        kmTravelled: 18,
         photos: [
           { id: 'l4', url: 'https://images.unsplash.com/photo-1548707309-dcebeab9ea9b?w=600&q=80', takenAt: '2023-10-12T09:00:00', locationName: 'Belém, Lisbon', lat: 38.6972, lng: -9.2066 },
           { id: 'l5', url: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=600&q=80', takenAt: '2023-10-12T11:30:00', locationName: 'Belém, Lisbon', lat: 38.6972, lng: -9.2066 },
@@ -73,6 +84,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2023-10-14',
         locationName: 'Sintra, Portugal',
+        summary: 'Day trip to Sintra — hiked to Pena Palace through fog, explored Moorish castle ruins above the clouds.',
+        kmTravelled: 55,
         photos: [
           { id: 'l6', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80', takenAt: '2023-10-14T10:00:00', locationName: 'Sintra, Portugal', lat: 38.7978, lng: -9.3905 },
           { id: 'l7', url: 'https://images.unsplash.com/photo-1596394723269-b2cbca4e3b47?w=600&q=80', takenAt: '2023-10-14T13:00:00', locationName: 'Sintra, Portugal', lat: 38.7978, lng: -9.3905 },
@@ -95,6 +108,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2024-01-15',
         locationName: 'Reykjavik City Centre',
+        summary: 'Arrived, explored Hallgrímskirkja and the harbour, saw the northern lights shimmer after midnight.',
+        kmTravelled: 9,
         photos: [
           { id: 'r1', url: 'https://images.unsplash.com/photo-1531168556467-80aace0d0144?w=600&q=80', takenAt: '2024-01-15T12:00:00', locationName: 'Reykjavik City Centre', lat: 64.1466, lng: -21.9426 },
           { id: 'r2', url: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=600&q=80', takenAt: '2024-01-15T14:00:00', locationName: 'Reykjavik City Centre', lat: 64.1466, lng: -21.9426 },
@@ -104,6 +119,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2024-01-17',
         locationName: 'Blue Lagoon, Iceland',
+        summary: 'Soaked in the geothermal Blue Lagoon for three hours; skin felt like silk for days afterward.',
+        kmTravelled: 47,
         photos: [
           { id: 'r4', url: 'https://images.unsplash.com/photo-1515859005217-8a1f08870f59?w=600&q=80', takenAt: '2024-01-17T10:00:00', locationName: 'Blue Lagoon, Iceland', lat: 63.8799, lng: -22.4490 },
           { id: 'r5', url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80', takenAt: '2024-01-17T12:00:00', locationName: 'Blue Lagoon, Iceland', lat: 63.8799, lng: -22.4490 },
@@ -112,6 +129,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2024-01-19',
         locationName: 'Golden Circle, Iceland',
+        summary: 'Full day on the Golden Circle — Þingvellir, Geysir eruptions every 8 minutes, and Gullfoss waterfall.',
+        kmTravelled: 300,
         photos: [
           { id: 'r6', url: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=600&q=80', takenAt: '2024-01-19T09:00:00', locationName: 'Golden Circle, Iceland', lat: 64.3271, lng: -20.1199 },
           { id: 'r7', url: 'https://images.unsplash.com/photo-1531168556467-80aace0d0144?w=600&q=80', takenAt: '2024-01-19T13:00:00', locationName: 'Golden Circle, Iceland', lat: 64.3271, lng: -20.1199 },
@@ -135,6 +154,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2023-05-04',
         locationName: 'Djemaa el-Fna, Marrakesh',
+        summary: 'Arrived and dove straight into the chaos of Djemaa el-Fna; ate lamb tagine under the open sky at dusk.',
+        kmTravelled: 7,
         photos: [
           { id: 'm1', url: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=600&q=80', takenAt: '2023-05-04T11:00:00', locationName: 'Djemaa el-Fna, Marrakesh', lat: 31.6258, lng: -7.9892 },
           { id: 'm2', url: 'https://images.unsplash.com/photo-1489493585363-d69421e0edd3?w=600&q=80', takenAt: '2023-05-04T14:00:00', locationName: 'Djemaa el-Fna, Marrakesh', lat: 31.6258, lng: -7.9892 },
@@ -144,6 +165,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2023-05-06',
         locationName: 'Medina Souks, Marrakesh',
+        summary: 'Navigated the souks for hours — spices, leather tanneries, silver lanterns; haggled cheerfully for a rug.',
+        kmTravelled: 5,
         photos: [
           { id: 'm4', url: 'https://images.unsplash.com/photo-1577948000111-9c970dfe3743?w=600&q=80', takenAt: '2023-05-06T10:00:00', locationName: 'Medina Souks, Marrakesh', lat: 31.6320, lng: -7.9875 },
           { id: 'm5', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80', takenAt: '2023-05-06T13:00:00', locationName: 'Medina Souks, Marrakesh', lat: 31.6320, lng: -7.9875 },
@@ -152,6 +175,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2023-05-08',
         locationName: 'Majorelle Garden, Marrakesh',
+        summary: 'Peaceful morning at Majorelle Garden — cobalt blue against lush green; an oasis in the middle of the city.',
+        kmTravelled: 4,
         photos: [
           { id: 'm6', url: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=600&q=80', takenAt: '2023-05-08T09:30:00', locationName: 'Majorelle Garden, Marrakesh', lat: 31.6415, lng: -8.0040 },
           { id: 'm7', url: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=600&q=80', takenAt: '2023-05-08T11:00:00', locationName: 'Majorelle Garden, Marrakesh', lat: 31.6415, lng: -8.0040 },
@@ -174,6 +199,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2024-04-10',
         locationName: 'Shinjuku, Tokyo',
+        summary: 'Arrived at dusk; immersed in Shinjuku neon until 2am — ramen at a standing counter, then golden gai bars.',
+        kmTravelled: 12,
         photos: [
           { id: 't1', url: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&q=80', takenAt: '2024-04-10T20:00:00', locationName: 'Shinjuku, Tokyo', lat: 35.6938, lng: 139.7034 },
           { id: 't2', url: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=600&q=80', takenAt: '2024-04-10T22:00:00', locationName: 'Shinjuku, Tokyo', lat: 35.6938, lng: 139.7034 },
@@ -182,6 +209,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2024-04-12',
         locationName: 'Shibuya, Tokyo',
+        summary: 'Crossed the famous scramble intersection twenty times, visited the Pokémon Centre, and watched sunset from Rooftop 109.',
+        kmTravelled: 16,
         photos: [
           { id: 't3', url: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=600&q=80', takenAt: '2024-04-12T10:00:00', locationName: 'Shibuya, Tokyo', lat: 35.6595, lng: 139.7005 },
           { id: 't4', url: 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=600&q=80', takenAt: '2024-04-12T14:00:00', locationName: 'Shibuya, Tokyo', lat: 35.6595, lng: 139.7005 },
@@ -191,6 +220,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2024-04-15',
         locationName: 'Asakusa, Tokyo',
+        summary: 'Morning at Senso-ji temple, rickshaw through old Edo streets, and Tokyo Skytree at golden hour.',
+        kmTravelled: 20,
         photos: [
           { id: 't6', url: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=80', takenAt: '2024-04-15T08:00:00', locationName: 'Asakusa, Tokyo', lat: 35.7147, lng: 139.7966 },
           { id: 't7', url: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=600&q=80', takenAt: '2024-04-15T11:00:00', locationName: 'Asakusa, Tokyo', lat: 35.7147, lng: 139.7966 },
@@ -214,6 +245,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2023-07-20',
         locationName: 'Gothic Quarter, Barcelona',
+        summary: 'Arrived and navigated the labyrinthine Gothic Quarter; discovered a hidden plaza and drank vermut until sunset.',
+        kmTravelled: 10,
         photos: [
           { id: 'b1', url: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80', takenAt: '2023-07-20T11:00:00', locationName: 'Gothic Quarter, Barcelona', lat: 41.3833, lng: 2.1768 },
           { id: 'b2', url: 'https://images.unsplash.com/photo-1464790719320-516ecd75af6c?w=600&q=80', takenAt: '2023-07-20T14:00:00', locationName: 'Gothic Quarter, Barcelona', lat: 41.3833, lng: 2.1768 },
@@ -222,6 +255,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2023-07-22',
         locationName: 'Sagrada Família, Barcelona',
+        summary: 'Spent the entire morning inside Sagrada Família — no photo captures the light through those stained-glass windows.',
+        kmTravelled: 8,
         photos: [
           { id: 'b3', url: 'https://images.unsplash.com/photo-1583779457094-ab6f77f7bf57?w=600&q=80', takenAt: '2023-07-22T09:00:00', locationName: 'Sagrada Família, Barcelona', lat: 41.4036, lng: 2.1744 },
           { id: 'b4', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80', takenAt: '2023-07-22T11:30:00', locationName: 'Sagrada Família, Barcelona', lat: 41.4036, lng: 2.1744 },
@@ -231,6 +266,8 @@ export const mockTrips: Trip[] = [
       {
         date: '2023-07-25',
         locationName: 'Barceloneta Beach, Barcelona',
+        summary: 'Last full day — lazy morning at Barceloneta beach, afternoon sangria, evening tapas crawl through El Born.',
+        kmTravelled: 13,
         photos: [
           { id: 'b6', url: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=600&q=80', takenAt: '2023-07-25T11:00:00', locationName: 'Barceloneta Beach, Barcelona', lat: 41.3795, lng: 2.1921 },
           { id: 'b7', url: 'https://images.unsplash.com/photo-1548707309-dcebeab9ea9b?w=600&q=80', takenAt: '2023-07-25T15:00:00', locationName: 'Barceloneta Beach, Barcelona', lat: 41.3795, lng: 2.1921 },

@@ -150,7 +150,7 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-stone-600 mb-1">Password <span className="text-red-400">*</span></label>
+            <label className="block text-xs font-medium text-stone-600 mb-1">Set password <span className="text-red-400">*</span></label>
             <div className="relative">
               <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 6 characters"
                 className="w-full px-4 py-3 pr-10 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300" />

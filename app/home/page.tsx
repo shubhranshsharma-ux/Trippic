@@ -6,7 +6,7 @@ import StatsHero from '@/components/StatsHero';
 import TripPostcard from '@/components/TripPostcard';
 import FilterPanel, { Filters, EMPTY_FILTERS, applyFilters } from '@/components/FilterPanel';
 import { Trip } from '@/lib/types';
-import { Luggage, Search, Plus, LogOut, User, Camera, SlidersHorizontal, X } from 'lucide-react';
+import { Luggage, Search, Plus, LogOut, User, Camera, SlidersHorizontal, X, Heart, Bookmark, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
@@ -51,10 +51,8 @@ export default function HomePage() {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Redirect to landing if not logged in
   useEffect(() => {
     if (user === null && typeof window !== 'undefined') {
-      // Give AuthProvider a tick to restore from localStorage
       const t = setTimeout(() => {
         if (!localStorage.getItem('trippic_user')) router.replace('/');
       }, 100);
@@ -74,29 +72,63 @@ export default function HomePage() {
   const afterFilters = applyFilters(searched, filters);
   const displayed = sortTrips(afterFilters, sort);
   const filterCount = activeFilterCount(filters);
-
   const firstName = user?.name?.split(' ')[0] ?? 'Traveller';
+  const favCount = trips.filter(t => t.isFavourite).length;
 
   return (
     <div className="min-h-screen bg-stone-50 pb-24">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-stone-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 flex-shrink-0">
             <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
               <Luggage className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-bold text-stone-800">Trippic</span>
+            <span className="text-lg font-bold text-stone-800 hidden sm:block">Trippic</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Search bar — shorter, centered */}
+          <div className="relative flex-1 max-w-xs">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+            <input
+              type="text"
+              placeholder="Search trips…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-stone-100 border border-transparent rounded-xl text-sm text-stone-700 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:bg-white focus:border-stone-200 transition-all"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Favourites button */}
+            <button
+              onClick={() => router.push('/favourites')}
+              className="relative flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 text-sm text-stone-600 hover:border-rose-300 hover:text-rose-500 transition-colors"
+            >
+              <Heart className="w-4 h-4" />
+              <span className="hidden sm:block">Favourites</span>
+              {favCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
+                  {favCount}
+                </span>
+              )}
+            </button>
+
+            {/* Wishlist button */}
+            <button
+              onClick={() => router.push('/wishlist')}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 text-sm text-stone-600 hover:border-amber-400 hover:text-amber-500 transition-colors"
+            >
+              <Bookmark className="w-4 h-4" />
+              <span className="hidden sm:block">Wishlist</span>
+            </button>
+
             {/* Mobile filter toggle */}
             <button
               onClick={() => setMobileFilterOpen(v => !v)}
-              className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 text-sm text-stone-600 hover:border-stone-300 transition-colors"
+              className="lg:hidden flex items-center gap-1.5 px-2.5 py-2 rounded-xl border border-stone-200 text-stone-600 hover:border-stone-300 transition-colors"
             >
               <SlidersHorizontal className="w-4 h-4" />
-              Filters
               {filterCount > 0 && (
                 <span className="w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">
                   {filterCount}
@@ -117,11 +149,18 @@ export default function HomePage() {
                 )}
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-11 bg-white rounded-xl shadow-lg border border-stone-100 py-2 w-48 z-50">
+                <div className="absolute right-0 top-11 bg-white rounded-xl shadow-lg border border-stone-100 py-2 w-52 z-50">
                   <div className="px-4 py-2 border-b border-stone-100">
                     <p className="text-sm font-medium text-stone-800">{user?.name ?? 'Traveller'}</p>
                     <p className="text-xs text-stone-400">{user?.email ?? ''}</p>
                   </div>
+                  <button
+                    onClick={() => { setMenuOpen(false); router.push('/profile'); }}
+                    className="w-full text-left px-4 py-2 text-sm text-stone-600 hover:bg-stone-50 flex items-center gap-2"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Edit profile
+                  </button>
                   <button
                     onClick={() => { logout(); router.push('/'); }}
                     className="w-full text-left px-4 py-2 text-sm text-stone-600 hover:bg-stone-50 flex items-center gap-2"
@@ -137,36 +176,19 @@ export default function HomePage() {
       </header>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        {/* Greeting */}
-        <h2 className="text-2xl font-bold text-stone-800 mb-6">
-          Hey, {firstName} ✈️
-        </h2>
-
-        {/* Search */}
-        <div className="relative mb-6">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
-          <input
-            type="text"
-            placeholder="Search destinations…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white border border-stone-200 rounded-xl text-sm text-stone-700 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent"
-          />
-        </div>
+        <h2 className="text-2xl font-bold text-stone-800 mb-6">Hey, {firstName} ✈️</h2>
 
         {/* Stats hero */}
         <div className="mb-6">
           <StatsHero stats={stats} tripCount={trips.length} />
         </div>
 
-        {/* Main layout: filter sidebar + content */}
+        {/* Main layout */}
         <div className="flex gap-6 items-start">
-          {/* Desktop filter sidebar */}
           <aside className="hidden lg:block">
             <FilterPanel trips={trips} filters={filters} onChange={setFilters} />
           </aside>
 
-          {/* Mobile filter overlay */}
           {mobileFilterOpen && (
             <div className="fixed inset-0 z-40 lg:hidden">
               <div className="absolute inset-0 bg-black/50" onClick={() => setMobileFilterOpen(false)} />
@@ -183,9 +205,7 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Content */}
           <div className="flex-1 min-w-0 space-y-4">
-            {/* Sort pills */}
             <div className="flex items-center gap-2 flex-wrap">
               {sortOptions.map(opt => (
                 <button
@@ -201,13 +221,10 @@ export default function HomePage() {
                 </button>
               ))}
               {filterCount > 0 && (
-                <span className="text-xs text-stone-400 ml-1">
-                  {displayed.length} of {trips.length} trips
-                </span>
+                <span className="text-xs text-stone-400 ml-1">{displayed.length} of {trips.length} trips</span>
               )}
             </div>
 
-            {/* Postcard grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
               {displayed.map(trip => (
                 <TripPostcard key={trip.id} trip={trip} />
@@ -224,10 +241,10 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* FAB — Add new trip */}
+      {/* FAB */}
       <button
         onClick={() => router.push('/new')}
-        className="fixed bottom-8 right-8 z-40 flex items-center gap-2.5 bg-stone-800 hover:bg-stone-700 text-white pl-4 pr-5 py-3.5 rounded-full shadow-xl hover:shadow-2xl transition-all hover:-translate-y-0.5 active:translate-y-0 font-semibold text-sm"
+        className="fixed bottom-8 right-8 z-40 flex items-center gap-2.5 bg-stone-800 hover:bg-stone-700 text-white pl-4 pr-5 py-3.5 rounded-full shadow-xl hover:shadow-2xl transition-all hover:-translate-y-0.5 font-semibold text-sm"
       >
         <Plus className="w-5 h-5" />
         New trip
