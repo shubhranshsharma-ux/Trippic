@@ -112,10 +112,10 @@ function PhotoCard({ photo, tripId, onOpen }: PhotoCardProps) {
   const showMeta = hasLocation || hasTime;
 
   return (
-    <div className="relative aspect-square rounded-xl overflow-hidden bg-stone-100 group/photo">
-      {/* Clickable image */}
+    <div className="relative aspect-square rounded-xl overflow-hidden bg-stone-100 group/photo shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+      {/* Clickable image with zoom on hover */}
       <button onClick={onOpen} className="absolute inset-0 z-0">
-        <Image src={photo.url} alt={photo.locationName || 'Photo'} fill className="object-cover" sizes="(max-width: 640px) 50vw, 33vw" />
+        <Image src={photo.url} alt={photo.locationName || 'Photo'} fill className="object-cover group-hover/photo:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 50vw, 33vw" />
       </button>
 
       {/* Bottom vignette with meta — only if data exists */}
@@ -136,12 +136,12 @@ function PhotoCard({ photo, tripId, onOpen }: PhotoCardProps) {
         </div>
       )}
 
-      {/* Top controls — show on hover */}
-      <div className="opacity-0 group-hover/photo:opacity-100 transition-opacity z-20">
+      {/* Top controls — always visible */}
+      <div className="z-20">
         {/* Heart / favourite */}
         <button
           onClick={e => { e.stopPropagation(); togglePhotoFavourite(photo.id); }}
-          className={`absolute top-2 left-2 w-7 h-7 rounded-full flex items-center justify-center shadow transition-all ${
+          className={`absolute top-2 left-2 w-7 h-7 rounded-full flex items-center justify-center shadow-md transition-all ${
             isFav ? 'bg-rose-500 text-white' : 'bg-black/50 backdrop-blur-sm text-white hover:bg-rose-500'
           }`}
         >
