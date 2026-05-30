@@ -104,31 +104,31 @@ export default function TripPostcard({ trip, featured = false }: Props) {
         {/* Bottom overlay content */}
         <div className="absolute bottom-0 left-0 right-0 px-6 pb-6">
           {/* Country + date pill row */}
-          <div className="flex items-center gap-3 mb-3">
-            <span className="bg-[#FDE047] text-[#171717] text-[11px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="bg-[#FDE047] text-[#171717] text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full">
               {trip.country}
             </span>
-            <span className="text-white/70 text-sm font-medium">• {formatMonth(trip.startDate)}</span>
+            <span className="text-white/60 text-xs font-medium">• {formatMonth(trip.startDate)}</span>
           </div>
-          {/* Trip name */}
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-2 tracking-tight">
+          {/* Trip name — reduced so image is the hero */}
+          <h2 className="text-xl sm:text-2xl font-extrabold text-white leading-tight mb-1.5 tracking-tight">
             {trip.destination}
           </h2>
-          {/* AI summary */}
+          {/* AI summary — one line only */}
           {trip.aiSummary && (
-            <p className="text-white/75 text-sm leading-relaxed line-clamp-2 max-w-xl">
+            <p className="text-white/65 text-xs leading-relaxed line-clamp-1 max-w-lg">
               {trip.aiSummary}
             </p>
           )}
           {/* Meta row */}
-          <div className="flex items-center gap-3 mt-3">
-            <span className="flex items-center gap-1.5 text-white/60 text-xs font-medium">
-              <Camera className="w-3.5 h-3.5" />{trip.photoCount} photos
+          <div className="flex items-center gap-2 mt-2">
+            <span className="flex items-center gap-1 text-white/55 text-[11px] font-medium">
+              <Camera className="w-3 h-3" />{trip.photoCount}
             </span>
-            <span className="text-white/40">·</span>
-            <span className="text-white/60 text-xs font-medium">{formatDateRange(trip.startDate, trip.endDate)}</span>
-            <span className="text-white/40">·</span>
-            <span className="bg-white/15 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">{tripType}</span>
+            <span className="text-white/30">·</span>
+            <span className="text-white/55 text-[11px] font-medium">{formatDateRange(trip.startDate, trip.endDate)}</span>
+            <span className="text-white/30">·</span>
+            <span className="bg-white/10 text-white/80 text-[10px] font-semibold px-2 py-0.5 rounded-full">{tripType}</span>
           </div>
         </div>
       </div>
