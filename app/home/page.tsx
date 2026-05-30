@@ -1,6 +1,7 @@
 'use client';
 
 import { useTrips } from '@/lib/tripsContext';
+import { useAuth } from '@/lib/authContext';
 import StatsHero from '@/components/StatsHero';
 import TripPostcard from '@/components/TripPostcard';
 import FilterPanel, { Filters, EMPTY_FILTERS, applyFilters } from '@/components/FilterPanel';
@@ -8,6 +9,7 @@ import { Trip } from '@/lib/types';
 import { Luggage, Search, Plus, LogOut, User, Camera, SlidersHorizontal, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 
 type SortKey = 'recent' | 'photos' | 'most-visited' | 'longest';
 
@@ -40,6 +42,7 @@ function activeFilterCount(f: Filters) {
 
 export default function HomePage() {
   const { trips, stats } = useTrips();
+  const { user, logout } = useAuth();
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<SortKey>('recent');
@@ -48,11 +51,20 @@ export default function HomePage() {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Redirect to landing if not logged in
+  useEffect(() => {
+    if (user === null && typeof window !== 'undefined') {
+      // Give AuthProvider a tick to restore from localStorage
+      const t = setTimeout(() => {
+        if (!localStorage.getItem('trippic_user')) router.replace('/');
+      }, 100);
+      return () => clearTimeout(t);
+    }
+  }, [user, router]);
+
   useEffect(() => {
     function onClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
     }
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
@@ -63,8 +75,10 @@ export default function HomePage() {
   const displayed = sortTrips(afterFilters, sort);
   const filterCount = activeFilterCount(filters);
 
+  const firstName = user?.name?.split(' ')[0] ?? 'Traveller';
+
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-stone-50 pb-24">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-stone-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -94,18 +108,22 @@ export default function HomePage() {
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setMenuOpen(v => !v)}
-                className="w-9 h-9 rounded-full border-2 border-stone-200 hover:border-amber-400 transition-colors bg-amber-100 flex items-center justify-center"
+                className="w-9 h-9 rounded-full border-2 border-stone-200 hover:border-amber-400 transition-colors bg-amber-100 flex items-center justify-center overflow-hidden"
               >
-                <User className="w-5 h-5 text-amber-600" />
+                {user?.avatarUrl ? (
+                  <Image src={user.avatarUrl} alt={user.name} width={36} height={36} className="object-cover w-full h-full" />
+                ) : (
+                  <User className="w-5 h-5 text-amber-600" />
+                )}
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-11 bg-white rounded-xl shadow-lg border border-stone-100 py-2 w-44 z-50">
+                <div className="absolute right-0 top-11 bg-white rounded-xl shadow-lg border border-stone-100 py-2 w-48 z-50">
                   <div className="px-4 py-2 border-b border-stone-100">
-                    <p className="text-sm font-medium text-stone-800">My Account</p>
-                    <p className="text-xs text-stone-400">Demo user</p>
+                    <p className="text-sm font-medium text-stone-800">{user?.name ?? 'Traveller'}</p>
+                    <p className="text-xs text-stone-400">{user?.email ?? ''}</p>
                   </div>
                   <button
-                    onClick={() => router.push('/')}
+                    onClick={() => { logout(); router.push('/'); }}
                     className="w-full text-left px-4 py-2 text-sm text-stone-600 hover:bg-stone-50 flex items-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
@@ -119,6 +137,11 @@ export default function HomePage() {
       </header>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        {/* Greeting */}
+        <h2 className="text-2xl font-bold text-stone-800 mb-6">
+          Hey, {firstName} ✈️
+        </h2>
+
         {/* Search */}
         <div className="relative mb-6">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
@@ -131,14 +154,14 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Stats hero — full width */}
+        {/* Stats hero */}
         <div className="mb-6">
           <StatsHero stats={stats} tripCount={trips.length} />
         </div>
 
-        {/* Main layout: sidebar + content */}
+        {/* Main layout: filter sidebar + content */}
         <div className="flex gap-6 items-start">
-          {/* Filter sidebar — desktop */}
+          {/* Desktop filter sidebar */}
           <aside className="hidden lg:block">
             <FilterPanel trips={trips} filters={filters} onChange={setFilters} />
           </aside>
@@ -186,16 +209,6 @@ export default function HomePage() {
 
             {/* Postcard grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              <button
-                onClick={() => router.push('/new')}
-                className="group border-2 border-dashed border-stone-200 rounded-2xl h-[220px] flex flex-col items-center justify-center gap-3 text-stone-400 hover:border-amber-400 hover:text-amber-500 transition-all"
-              >
-                <div className="w-10 h-10 rounded-full border-2 border-current flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Plus className="w-5 h-5" />
-                </div>
-                <span className="text-sm font-medium">New trip</span>
-              </button>
-
               {displayed.map(trip => (
                 <TripPostcard key={trip.id} trip={trip} />
               ))}
@@ -210,6 +223,15 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* FAB — Add new trip */}
+      <button
+        onClick={() => router.push('/new')}
+        className="fixed bottom-8 right-8 z-40 flex items-center gap-2.5 bg-stone-800 hover:bg-stone-700 text-white pl-4 pr-5 py-3.5 rounded-full shadow-xl hover:shadow-2xl transition-all hover:-translate-y-0.5 active:translate-y-0 font-semibold text-sm"
+      >
+        <Plus className="w-5 h-5" />
+        New trip
+      </button>
     </div>
   );
 }
