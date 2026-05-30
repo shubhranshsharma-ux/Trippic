@@ -3,7 +3,7 @@
 import { useTrips } from '@/lib/tripsContext';
 import { useAuth } from '@/lib/authContext';
 import TripPostcard from '@/components/TripPostcard';
-import FilterPanel, { Filters, EMPTY_FILTERS, applyFilters } from '@/components/FilterPanel';
+import { Filters, EMPTY_FILTERS, applyFilters } from '@/components/FilterPanel';
 import StoriesCarousel from '@/components/StoriesCarousel';
 import WishlistPanel from '@/components/WishlistPanel';
 import FavouritesContent from '@/components/FavouritesContent';
@@ -12,7 +12,7 @@ import TravelHistory from '@/components/TravelHistory';
 import { Trip } from '@/lib/types';
 import {
   Luggage, Search, Plus, LogOut, User, Bookmark,
-  Settings, Map, Star, Archive, BarChart2, SlidersHorizontal, X, Camera, ChevronDown
+  Settings, Map, Star, Archive, BarChart2, Camera, ChevronDown, SlidersHorizontal
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
@@ -63,7 +63,6 @@ export default function HomePage() {
   const [sort, setSort] = useState<SortKey>('recent');
   const [menuOpen, setMenuOpen] = useState(false);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
-  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<NavTab>('trips');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -171,15 +170,6 @@ export default function HomePage() {
             )}
 
             <div className="ml-auto flex items-center gap-2">
-              {/* Archived */}
-              <button
-                onClick={() => setActiveTab('archived')}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 text-sm text-stone-600 hover:border-stone-300 hover:text-stone-800 transition-colors"
-              >
-                <Archive className="w-4 h-4" />
-                <span className="hidden sm:block">Archived</span>
-              </button>
-
               {/* Wishlist */}
               <button
                 onClick={() => setWishlistOpen(true)}
@@ -234,7 +224,6 @@ export default function HomePage() {
             <div className="space-y-5">
               {/* Compact stats + stories row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Left: greeting + stats */}
                 <div className="bg-white rounded-2xl border border-stone-100 shadow-sm px-5 py-4 flex flex-col justify-between">
                   <div>
                     <p className="text-xs text-stone-400 uppercase tracking-wide font-medium mb-1">Welcome back</p>
@@ -255,66 +244,140 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-
-                {/* Right: AI stories carousel */}
                 <StoriesCarousel />
               </div>
 
-              {/* Sort + filter row */}
-              <div className="flex items-center gap-2 flex-wrap">
-                {/* Sort By dropdown */}
-                <div className="relative">
-                  <select
-                    value={sort}
-                    onChange={e => setSort(e.target.value as SortKey)}
-                    className="appearance-none pl-3 pr-8 py-1.5 rounded-xl bg-white border border-stone-200 text-sm text-stone-700 font-medium focus:outline-none focus:ring-2 focus:ring-amber-300 cursor-pointer hover:border-stone-300 transition-colors"
-                  >
-                    {sortOptions.map(opt => (
-                      <option key={opt.key} value={opt.key}>Sort: {opt.label}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+              {/* Two-column: Organize panel + trips */}
+              <div className="flex gap-6 items-start">
+
+                {/* ── Organize panel (always visible) ── */}
+                <div className="w-56 flex-shrink-0 bg-white rounded-2xl border border-stone-100 shadow-sm p-5 space-y-6 sticky top-20">
+                  <h3 className="font-bold text-stone-800 text-base">Organize</h3>
+
+                  {/* Sort By */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-2">Sort By</p>
+                    <div className="relative">
+                      <select
+                        value={sort}
+                        onChange={e => setSort(e.target.value as SortKey)}
+                        className="appearance-none w-full pl-3 pr-7 py-2 rounded-xl bg-stone-50 border border-stone-200 text-sm text-stone-700 font-medium focus:outline-none focus:ring-2 focus:ring-amber-300 cursor-pointer hover:border-stone-300 transition-colors"
+                      >
+                        {sortOptions.map(opt => (
+                          <option key={opt.key} value={opt.key}>{opt.label}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* Location Tags */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-2">Location Tags</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {[...new Set(visibleTrips.map(t => t.city))].sort().map(city => (
+                        <button
+                          key={city}
+                          onClick={() => setFilters(f => ({ ...f, cities: f.cities.includes(city) ? f.cities.filter(c => c !== city) : [...f.cities, city] }))}
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                            filters.cities.includes(city)
+                              ? 'bg-stone-800 text-white'
+                              : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                          }`}
+                        >
+                          {city}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Year */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-2">Year</p>
+                    <div className="space-y-1.5">
+                      {[...new Set(visibleTrips.map(t => new Date(t.endDate).getFullYear()))].sort((a,b) => b-a).map(y => (
+                        <label key={y} className="flex items-center gap-2 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={filters.years.includes(y)}
+                            onChange={() => setFilters(f => ({ ...f, years: f.years.includes(y) ? f.years.filter(x => x !== y) : [...f.years, y] }))}
+                            className="w-3.5 h-3.5 rounded accent-amber-500"
+                          />
+                          <span className="text-sm text-stone-600 group-hover:text-stone-800 transition-colors">{y}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Trip Type */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-2">Trip Type</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Beach', 'City', 'Mountains', 'Roadtrip'].map(type => (
+                        <button
+                          key={type}
+                          onClick={() => setFilters(f => ({ ...f, tripTypes: f.tripTypes.includes(type) ? f.tripTypes.filter(x => x !== type) : [...f.tripTypes, type] }))}
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                            filters.tripTypes.includes(type)
+                              ? 'bg-amber-500 text-white'
+                              : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Duration */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-2">Duration</p>
+                    <div className="space-y-1.5">
+                      {['Weekend', 'Up to a week', 'Longer'].map(d => (
+                        <label key={d} className="flex items-center gap-2 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={filters.duration.includes(d)}
+                            onChange={() => setFilters(f => ({ ...f, duration: f.duration.includes(d) ? f.duration.filter(x => x !== d) : [...f.duration, d] }))}
+                            className="w-3.5 h-3.5 rounded accent-amber-500"
+                          />
+                          <span className="text-sm text-stone-600 group-hover:text-stone-800 transition-colors">{d}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Clear filters */}
+                  {filterCount > 0 && (
+                    <button
+                      onClick={() => setFilters(EMPTY_FILTERS)}
+                      className="w-full text-xs text-stone-400 hover:text-stone-600 transition-colors text-center"
+                    >
+                      Clear all filters ({filterCount})
+                    </button>
+                  )}
                 </div>
 
-                <button
-                  onClick={() => setFilterPanelOpen(v => !v)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium border transition-colors ${filterCount > 0 ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-600 border-stone-200 hover:border-stone-300'}`}
-                >
-                  <SlidersHorizontal className="w-3.5 h-3.5" />
-                  Filters{filterCount > 0 ? ` (${filterCount})` : ''}
-                </button>
-                {filterCount > 0 && <span className="text-xs text-stone-400">{displayed.length} of {visibleTrips.length} trips</span>}
-              </div>
-
-              {/* Filter panel inline */}
-              {filterPanelOpen && (
-                <div className="relative">
-                  <button onClick={() => setFilterPanelOpen(false)} className="absolute top-3 right-3 z-10 text-stone-400 hover:text-stone-600">
-                    <X className="w-4 h-4" />
-                  </button>
-                  <FilterPanel trips={visibleTrips} filters={filters} onChange={setFilters} />
-                </div>
-              )}
-
-              {/* Trip grid */}
-              {displayed.length === 0 ? (
-                <div className="text-center py-16 text-stone-400">
-                  <Camera className="w-10 h-10 mx-auto mb-3 opacity-40" />
-                  <p>{search ? `No trips match "${search}"` : 'No trips match these filters'}</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Featured first trip — full width large card */}
-                  {featuredTrip && <TripPostcard trip={featuredTrip} featured />}
-
-                  {/* Rest in 3-col grid */}
-                  {restTrips.length > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {restTrips.map(trip => <TripPostcard key={trip.id} trip={trip} />)}
+                {/* ── Trips grid ── */}
+                <div className="flex-1 min-w-0">
+                  {displayed.length === 0 ? (
+                    <div className="text-center py-16 text-stone-400">
+                      <Camera className="w-10 h-10 mx-auto mb-3 opacity-40" />
+                      <p>{search ? `No trips match "${search}"` : 'No trips match these filters'}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {featuredTrip && <TripPostcard trip={featuredTrip} featured />}
+                      {restTrips.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {restTrips.map(trip => <TripPostcard key={trip.id} trip={trip} />)}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
+
+              </div>
             </div>
           )}
 
