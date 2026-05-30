@@ -8,6 +8,7 @@ import FilterPanel, { Filters, EMPTY_FILTERS, applyFilters } from '@/components/
 import { Trip } from '@/lib/types';
 import { Luggage, Search, Plus, LogOut, User, Camera, SlidersHorizontal, X, Heart, Bookmark, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import WishlistPanel from '@/components/WishlistPanel';
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 
@@ -49,6 +50,7 @@ export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -116,7 +118,7 @@ export default function HomePage() {
 
             {/* Wishlist button */}
             <button
-              onClick={() => router.push('/wishlist')}
+              onClick={() => setWishlistOpen(true)}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 text-sm text-stone-600 hover:border-amber-400 hover:text-amber-500 transition-colors"
             >
               <Bookmark className="w-4 h-4" />
@@ -249,6 +251,9 @@ export default function HomePage() {
         <Plus className="w-5 h-5" />
         New trip
       </button>
+
+      {/* Wishlist floating panel */}
+      <WishlistPanel open={wishlistOpen} onClose={() => setWishlistOpen(false)} />
     </div>
   );
 }
