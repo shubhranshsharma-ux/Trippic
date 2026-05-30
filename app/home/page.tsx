@@ -11,8 +11,8 @@ import ArchivedContent from '@/components/ArchivedContent';
 import TravelHistory from '@/components/TravelHistory';
 import { Trip } from '@/lib/types';
 import {
-  Luggage, Search, Plus, LogOut, User, Heart, Bookmark,
-  Settings, Map, Star, Archive, BarChart2, SlidersHorizontal, X, Camera, Pencil
+  Luggage, Search, Plus, LogOut, User, Bookmark,
+  Settings, Map, Star, Archive, BarChart2, SlidersHorizontal, X, Camera, ChevronDown
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
@@ -88,7 +88,6 @@ export default function HomePage() {
   const displayed = sortTrips(afterFilters, sort);
   const filterCount = activeFilterCount(filters);
   const firstName = user?.name?.split(' ')[0] ?? 'Traveller';
-  const favCount = trips.filter(t => t.isFavourite).length;
 
   // Featured = first trip, rest in grid
   const [featuredTrip, ...restTrips] = displayed;
@@ -133,12 +132,6 @@ export default function HomePage() {
         {/* Bottom actions */}
         <div className="space-y-1 border-t border-stone-100 pt-4 mt-4">
           <button
-            onClick={() => setWishlistOpen(true)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-stone-500 hover:bg-stone-100 hover:text-stone-800 transition-colors"
-          >
-            <Bookmark className="w-4 h-4" /> Wishlist
-          </button>
-          <button
             onClick={() => router.push('/profile')}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-stone-500 hover:bg-stone-100 hover:text-stone-800 transition-colors"
           >
@@ -178,26 +171,32 @@ export default function HomePage() {
             )}
 
             <div className="ml-auto flex items-center gap-2">
-              {/* Favourites */}
+              {/* Archived */}
               <button
-                onClick={() => setActiveTab('favourites')}
-                className="relative flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 text-sm text-stone-600 hover:border-rose-300 hover:text-rose-500 transition-colors"
+                onClick={() => setActiveTab('archived')}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 text-sm text-stone-600 hover:border-stone-300 hover:text-stone-800 transition-colors"
               >
-                <Heart className="w-4 h-4" />
-                <span className="hidden sm:block">Favourites</span>
-                {favCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">{favCount}</span>
-                )}
+                <Archive className="w-4 h-4" />
+                <span className="hidden sm:block">Archived</span>
               </button>
 
-              {/* Avatar with edit profile to the left */}
+              {/* Wishlist */}
+              <button
+                onClick={() => setWishlistOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 text-sm text-stone-600 hover:border-amber-300 hover:text-amber-600 transition-colors"
+              >
+                <Bookmark className="w-4 h-4" />
+                <span className="hidden sm:block">Wishlist</span>
+              </button>
+
+              {/* Avatar with gear icon to the left */}
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => router.push('/profile')}
                   className="text-stone-400 hover:text-stone-700 transition-colors p-1.5 rounded-lg hover:bg-stone-100"
-                  title="Edit profile"
+                  title="Settings"
                 >
-                  <Pencil className="w-4 h-4" />
+                  <Settings className="w-4 h-4" />
                 </button>
                 <div className="relative" ref={menuRef}>
                   <button
@@ -263,20 +262,23 @@ export default function HomePage() {
 
               {/* Sort + filter row */}
               <div className="flex items-center gap-2 flex-wrap">
-                {sortOptions.map(opt => (
-                  <button
-                    key={opt.key}
-                    onClick={() => setSort(opt.key)}
-                    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                      sort === opt.key ? 'bg-stone-800 text-white' : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-300'
-                    }`}
+                {/* Sort By dropdown */}
+                <div className="relative">
+                  <select
+                    value={sort}
+                    onChange={e => setSort(e.target.value as SortKey)}
+                    className="appearance-none pl-3 pr-8 py-1.5 rounded-xl bg-white border border-stone-200 text-sm text-stone-700 font-medium focus:outline-none focus:ring-2 focus:ring-amber-300 cursor-pointer hover:border-stone-300 transition-colors"
                   >
-                    {opt.label}
-                  </button>
-                ))}
+                    {sortOptions.map(opt => (
+                      <option key={opt.key} value={opt.key}>Sort: {opt.label}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                </div>
+
                 <button
                   onClick={() => setFilterPanelOpen(v => !v)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${filterCount > 0 ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-600 border-stone-200 hover:border-stone-300'}`}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium border transition-colors ${filterCount > 0 ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-600 border-stone-200 hover:border-stone-300'}`}
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
                   Filters{filterCount > 0 ? ` (${filterCount})` : ''}
