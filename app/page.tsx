@@ -59,14 +59,14 @@ export default function LandingPage() {
       {/* Nav */}
       <nav className="relative z-10 flex items-center justify-between px-6 sm:px-10 pt-8">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
-            <Luggage className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 bg-[#FDE047] rounded-xl flex items-center justify-center">
+            <Luggage className="w-5 h-5 text-[#171717]" />
           </div>
-          <span className="text-white font-bold text-xl tracking-tight">Trippic</span>
+          <span className="text-white font-extrabold text-xl tracking-tight">Trippic</span>
         </div>
         <button
           onClick={() => router.push('/about')}
-          className="text-white/80 hover:text-white text-sm font-medium transition-colors border border-white/30 hover:border-white/60 px-4 py-2 rounded-full backdrop-blur-sm"
+          className="text-white/80 hover:text-white text-sm font-semibold transition-colors border border-white/30 hover:border-white/60 px-4 py-2 rounded-full backdrop-blur-sm"
         >
           About us
         </button>
@@ -76,15 +76,15 @@ export default function LandingPage() {
       <div className="relative z-10 flex-1 flex flex-col justify-center px-6 sm:px-10 pt-8 pb-16 max-w-2xl">
         {/* Destination label pill */}
         <div className="flex items-center gap-2 mb-8">
-          <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-          <span className="text-white/70 text-sm font-medium tracking-wide uppercase">
+          <div className="w-2 h-2 rounded-full bg-[#FDE047] animate-pulse" />
+          <span className="text-white/70 text-sm font-semibold tracking-wide uppercase">
             {CAROUSEL_IMAGES[current].label}
           </span>
         </div>
 
         {/* Headline */}
-        <h1 className="text-5xl sm:text-6xl font-bold text-white leading-[1.08] mb-5 tracking-tight">
-          Every <em className="not-italic italic font-bold">trip</em> you&apos;ve<br />
+        <h1 className="text-5xl sm:text-6xl font-extrabold text-white leading-[1.08] mb-5 tracking-tight">
+          Every <em className="not-italic italic font-extrabold">trip</em> you&apos;ve<br />
           ever taken,<br />
           <span className="text-white/90">in one beautiful</span><br />
           place.
@@ -98,7 +98,7 @@ export default function LandingPage() {
         <div className="flex flex-col gap-4 max-w-xs">
           <button
             onClick={() => router.push('/signup')}
-            className="w-full bg-white hover:bg-stone-50 text-stone-900 font-bold py-4 px-8 rounded-2xl text-base shadow-2xl transition-all hover:-translate-y-0.5 hover:shadow-3xl active:translate-y-0"
+            className="w-full bg-[#FDE047] hover:bg-yellow-300 text-[#171717] font-bold py-4 px-8 rounded-2xl text-base shadow-2xl transition-all hover:-translate-y-0.5 active:translate-y-0"
           >
             Connect Google Photos
           </button>
@@ -106,7 +106,7 @@ export default function LandingPage() {
             Already have an account?{' '}
             <button
               onClick={() => router.push('/login')}
-              className="text-white underline underline-offset-2 hover:text-white/90 font-medium transition-colors"
+              className="text-white underline underline-offset-2 hover:text-white/90 font-semibold transition-colors"
             >
               Log in
             </button>
