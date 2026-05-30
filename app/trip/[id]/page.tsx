@@ -3,7 +3,7 @@
 import { useTrips } from '@/lib/tripsContext';
 import { Photo } from '@/lib/types';
 import Lightbox from '@/components/Lightbox';
-import { ArrowLeft, Camera, Calendar, MapPin, Sparkles, MoreVertical, Trash2, ImageIcon, Pencil, Check, X, Heart, Clock } from 'lucide-react';
+import { ArrowLeft, Camera, Calendar, MapPin, Sparkles, MoreVertical, Trash2, ImageIcon, Pencil, Check, X, Heart, Clock, Archive } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
@@ -22,8 +22,10 @@ function formatTime(iso: string) {
 interface PhotoMenuProps {
   onDelete: () => void;
   onMakeHero: () => void;
+  onArchive: () => void;
+  isArchived: boolean;
 }
-function PhotoMenu({ onDelete, onMakeHero }: PhotoMenuProps) {
+function PhotoMenu({ onDelete, onMakeHero, onArchive, isArchived }: PhotoMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -40,9 +42,12 @@ function PhotoMenu({ onDelete, onMakeHero }: PhotoMenuProps) {
         <MoreVertical className="w-3.5 h-3.5" />
       </button>
       {open && (
-        <div className="absolute right-0 top-8 bg-white rounded-xl shadow-xl border border-stone-100 py-1 w-40 z-20">
+        <div className="absolute right-0 top-8 bg-white rounded-xl shadow-xl border border-stone-100 py-1 w-44 z-20">
           <button onClick={e => { e.stopPropagation(); onMakeHero(); setOpen(false); }} className="w-full text-left px-3 py-2 text-xs text-stone-700 hover:bg-stone-50 flex items-center gap-2">
             <ImageIcon className="w-3.5 h-3.5 text-amber-500" /> Make hero photo
+          </button>
+          <button onClick={e => { e.stopPropagation(); onArchive(); setOpen(false); }} className="w-full text-left px-3 py-2 text-xs text-stone-700 hover:bg-stone-50 flex items-center gap-2">
+            <Archive className="w-3.5 h-3.5 text-stone-400" /> {isArchived ? 'Unarchive' : 'Archive photo'}
           </button>
           <button onClick={e => { e.stopPropagation(); onDelete(); setOpen(false); }} className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2">
             <Trash2 className="w-3.5 h-3.5" /> Delete photo
@@ -103,8 +108,9 @@ interface PhotoCardProps {
   onOpen: () => void;
 }
 function PhotoCard({ photo, tripId, onOpen }: PhotoCardProps) {
-  const { deletePhoto, setHeroPhoto, togglePhotoFavourite, favouritePhotoIds } = useTrips();
+  const { deletePhoto, setHeroPhoto, togglePhotoFavourite, favouritePhotoIds, toggleArchivePhoto, archivedPhotoIds } = useTrips();
   const isFav = favouritePhotoIds.includes(photo.id);
+  const isArchived = archivedPhotoIds.includes(photo.id);
 
   // Only show meta if data actually exists on the photo
   const hasLocation = Boolean(photo.locationName);
@@ -152,6 +158,8 @@ function PhotoCard({ photo, tripId, onOpen }: PhotoCardProps) {
         <PhotoMenu
           onDelete={() => deletePhoto(tripId, photo.id)}
           onMakeHero={() => setHeroPhoto(tripId, photo.url)}
+          onArchive={() => toggleArchivePhoto(photo.id)}
+          isArchived={isArchived}
         />
       </div>
     </div>
