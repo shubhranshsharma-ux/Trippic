@@ -92,8 +92,9 @@ export default function TravelHistory() {
         <p className="text-sm text-[#737373] mt-0.5">Your journeys, visualised.</p>
       </div>
 
-      {/* ── Dark aggregate stats panel ── */}
-      <div className="bg-[#1a1a1a] rounded-2xl p-5 space-y-4">
+      {/* ── Aggregate stats panel ── */}
+      <div className="card py-4 px-5 space-y-4">
+        <p className="label-xs">Overall snapshot</p>
         {/* Stat tiles */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
@@ -102,9 +103,9 @@ export default function TravelHistory() {
             { label: 'Days abroad',  value: totalDays },
             { label: 'Countries',    value: totalCountries },
           ].map(({ label, value }) => (
-            <div key={label} className="bg-[#2a2a2a] rounded-xl p-3 flex flex-col gap-1">
-              <span className="text-[11px] text-white/50 font-semibold uppercase tracking-wide">{label}</span>
-              <span className="text-2xl font-extrabold text-white leading-none">{value}</span>
+            <div key={label} className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-3 flex flex-col gap-1">
+              <span className="text-[11px] text-[#737373] font-semibold uppercase tracking-wide">{label}</span>
+              <span className="text-2xl font-extrabold text-[#171717] leading-none">{value}</span>
             </div>
           ))}
         </div>
@@ -112,30 +113,30 @@ export default function TravelHistory() {
         {/* Charts row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Trips per year sparkline */}
-          <div className="bg-[#2a2a2a] rounded-xl p-4">
-            <p className="text-white font-bold text-sm mb-3">Trips per year</p>
+          <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
+            <p className="text-[#171717] font-bold text-sm mb-3">Trips per year</p>
             <div className="flex items-end gap-2 h-16">
               {yearEntries.map(([year, count]) => (
                 <div key={year} className="flex-1 flex flex-col items-center gap-1">
                   <div
-                    className="w-full bg-[#FDE047]/80 rounded-t-sm"
+                    className="w-full bg-[#FDE047] rounded-t-sm"
                     style={{ height: `${Math.max((count / maxYearCount) * 56, 4)}px` }}
                   />
-                  <span className="text-[9px] text-white/40">{year}</span>
+                  <span className="text-[9px] text-[#737373]">{year}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Time of day */}
-          <div className="bg-[#2a2a2a] rounded-xl p-4">
-            <p className="text-white font-bold text-sm mb-3">When you shoot</p>
+          <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
+            <p className="text-[#171717] font-bold text-sm mb-3">When you shoot</p>
             <div className="space-y-2">
               {aggTodRows.map(({ label, val }) => (
                 <div key={label} className="flex items-center gap-2">
-                  <span className="text-[11px] text-white/50 w-16 flex-shrink-0">{label}</span>
-                  <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#FDE047]/70 rounded-full" style={{ width: `${(val / aggTodTotal) * 100}%` }} />
+                  <span className="text-[11px] text-[#737373] w-16 flex-shrink-0">{label}</span>
+                  <div className="flex-1 h-1.5 bg-[#E5E5E5] rounded-full overflow-hidden">
+                    <div className="h-full bg-[#FDE047] rounded-full" style={{ width: `${(val / aggTodTotal) * 100}%` }} />
                   </div>
                 </div>
               ))}

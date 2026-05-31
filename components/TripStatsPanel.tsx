@@ -42,12 +42,12 @@ function computeStats(trip: Trip) {
 
 function Tile({ label, value, gps = false }: { label: string; value: string | number; gps?: boolean }) {
   return (
-    <div className={`rounded-xl p-3 flex flex-col gap-1 ${gps ? 'bg-[#1e3a5f]' : 'bg-[#2a2a2a]'}`}>
+    <div className={`rounded-xl p-3 flex flex-col gap-1 ${gps ? 'bg-[#EFF6FF] border border-[#BFDBFE]' : 'bg-[#F5F5F5] border border-[#E5E5E5]'}`}>
       <div className="flex items-center justify-between">
-        <span className="text-[11px] text-white/50 font-semibold uppercase tracking-wide">{label}</span>
-        {gps && <span className="text-[9px] font-bold bg-[#0EA5E9]/30 text-[#0EA5E9] px-1.5 py-0.5 rounded-full">GPS</span>}
+        <span className="text-[11px] text-[#737373] font-semibold uppercase tracking-wide">{label}</span>
+        {gps && <span className="text-[9px] font-bold bg-[#0EA5E9]/20 text-[#0EA5E9] px-1.5 py-0.5 rounded-full">GPS</span>}
       </div>
-      <span className="text-2xl font-extrabold text-white leading-none">{value}</span>
+      <span className="text-2xl font-extrabold text-[#171717] leading-none">{value}</span>
     </div>
   );
 }
@@ -74,18 +74,18 @@ export default function TripStatsPanel({ trip, onClose }: { trip: Trip; onClose:
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
       <div
-        className="relative w-full max-w-lg bg-[#1a1a1a] rounded-2xl p-5 space-y-4 overflow-y-auto max-h-[90vh]"
+        className="relative w-full max-w-lg bg-white rounded-2xl p-5 space-y-4 overflow-y-auto max-h-[90vh] shadow-xl"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-white font-extrabold text-lg leading-tight">{trip.destination}</p>
-            <p className="text-white/40 text-xs mt-0.5 font-medium">trip stats</p>
+            <p className="text-[#171717] font-extrabold text-lg leading-tight">{trip.destination}</p>
+            <p className="label-xs mt-0.5">trip stats</p>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors flex-shrink-0">
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-[#F5F5F5] hover:bg-[#E5E5E5] text-[#171717] flex items-center justify-center transition-colors flex-shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -101,42 +101,42 @@ export default function TripStatsPanel({ trip, onClose }: { trip: Trip; onClose:
         {/* Charts row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Photos per day sparkline */}
-          <div className="bg-[#2a2a2a] rounded-xl p-4">
-            <p className="text-white font-bold text-sm mb-3">Photos per day</p>
+          <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
+            <p className="text-[#171717] font-bold text-sm mb-3">Photos per day</p>
             <div className="flex items-end gap-1.5 h-16">
               {photosPerDay.map((count, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-1">
                   <div
-                    className="w-full bg-[#FDE047]/80 rounded-t-sm transition-all"
+                    className="w-full bg-[#FDE047] rounded-t-sm transition-all"
                     style={{ height: `${Math.max((count / maxPpd) * 56, count > 0 ? 4 : 0)}px` }}
                   />
-                  <span className="text-[9px] text-white/40">D{i + 1}</span>
+                  <span className="text-[9px] text-[#737373]">D{i + 1}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Time of day */}
-          <div className="bg-[#2a2a2a] rounded-xl p-4">
-            <p className="text-white font-bold text-sm mb-3">When you shot</p>
+          <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
+            <p className="text-[#171717] font-bold text-sm mb-3">When you shot</p>
             <div className="space-y-2">
               {todRows.map(({ label, val }) => (
                 <div key={label} className="flex items-center gap-2">
-                  <span className="text-[11px] text-white/50 w-16 flex-shrink-0">{label}</span>
-                  <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#FDE047]/70 rounded-full" style={{ width: `${(val / todTotal) * 100}%` }} />
+                  <span className="text-[11px] text-[#737373] w-16 flex-shrink-0">{label}</span>
+                  <div className="flex-1 h-1.5 bg-[#E5E5E5] rounded-full overflow-hidden">
+                    <div className="h-full bg-[#FDE047] rounded-full" style={{ width: `${(val / todTotal) * 100}%` }} />
                   </div>
                 </div>
               ))}
             </div>
-            <p className="text-white/40 text-[11px] mt-3">You were a {todLabel}</p>
+            <p className="text-[#737373] text-[11px] mt-3">You were a {todLabel}</p>
           </div>
         </div>
 
         {/* Footer note */}
         {hasGPS && (
-          <p className="text-white/25 text-[10px]">
-            Tiles marked <span className="bg-[#0EA5E9]/30 text-[#0EA5E9] px-1 rounded">GPS</span> only appear when location data is available.
+          <p className="text-[#737373] text-[10px]">
+            Tiles marked <span className="bg-[#0EA5E9]/20 text-[#0EA5E9] px-1 rounded">GPS</span> only appear when location data is available.
           </p>
         )}
       </div>
