@@ -506,21 +506,15 @@ export default function HomePage() {
                   {/* Sort By */}
                   <div>
                     <p className="label-xs mb-2">Sort By</p>
-                    <div className="flex flex-wrap gap-1.5">
+                    <select
+                      value={sort}
+                      onChange={e => setSort(e.target.value as SortKey)}
+                      className="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 text-sm bg-white text-[#171717] focus:outline-none focus:ring-2 focus:ring-[#FDE047]"
+                    >
                       {sortOptions.map(opt => (
-                        <button
-                          key={opt.key}
-                          onClick={() => setSort(opt.key)}
-                          className={`rounded-full px-3 py-1 text-sm cursor-pointer transition-colors ${
-                            sort === opt.key
-                              ? 'bg-[#FDE047] text-[#171717] font-semibold'
-                              : 'bg-[#F5F5F5] text-[#525252] hover:bg-[#E5E5E5]'
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
+                        <option key={opt.key} value={opt.key}>{opt.label}</option>
                       ))}
-                    </div>
+                    </select>
                   </div>
 
                   {/* Location Tags */}
