@@ -232,16 +232,37 @@ export default function HomePage() {
     setSyncing(true);
     setSyncMsg('');
     try {
-      const res = await fetch('/api/photos/sync');
-      if (res.status === 401) {
+      // 1. Create a Picker session
+      const createRes = await fetch('/api/photos/picker/create', { method: 'POST' });
+      if (createRes.status === 401) {
         router.push('/api/auth/google');
         return;
       }
-      if (!res.ok) throw new Error('Sync failed');
-      const data = await res.json() as { mediaItems: unknown[]; count: number };
-      const newTrips = groupPhotosIntoTrips(data.mediaItems as Parameters<typeof groupPhotosIntoTrips>[0]);
-      addTrips(newTrips);
-      setSyncMsg(`Synced ${newTrips.length} trips from ${data.count} photos`);
+      if (!createRes.ok) throw new Error('create failed');
+      const sessionData = await createRes.json() as { id: string; pickerUri: string };
+
+      // 2. Open the Google Photos picker for the user to select photos
+      setSyncMsg('Pick photos in the Google window…');
+      const picker = window.open(sessionData.pickerUri, '_blank');
+
+      // 3. Poll until the user finishes picking
+      const deadline = Date.now() + 5 * 60 * 1000; // 5 min timeout
+      while (Date.now() < deadline) {
+        await new Promise(r => setTimeout(r, 3000));
+        const pollRes = await fetch(`/api/photos/picker/poll?sessionId=${encodeURIComponent(sessionData.id)}`);
+        if (!pollRes.ok) continue;
+        const poll = await pollRes.json() as { ready: boolean; mediaItems?: unknown[]; count?: number };
+        if (poll.ready) {
+          picker?.close();
+          const newTrips = groupPhotosIntoTrips(
+            (poll.mediaItems ?? []) as Parameters<typeof groupPhotosIntoTrips>[0]
+          );
+          addTrips(newTrips);
+          setSyncMsg(`Imported ${newTrips.length} trips from ${poll.count} photos`);
+          return;
+        }
+      }
+      setSyncMsg('Timed out waiting for photo selection.');
     } catch {
       setSyncMsg('Sync failed. Please try again.');
     } finally {
