@@ -4,7 +4,7 @@ import { useTrips } from '@/lib/tripsContext';
 import { useAuth } from '@/lib/authContext';
 import TripPostcard from '@/components/TripPostcard';
 import { Filters, EMPTY_FILTERS, applyFilters } from '@/components/FilterPanel';
-import StoriesCarousel from '@/components/StoriesCarousel';
+import StoriesCarousel, { startAmbientPad } from '@/components/StoriesCarousel';
 import WishlistPanel from '@/components/WishlistPanel';
 import FavouritesContent from '@/components/FavouritesContent';
 import ArchivedContent from '@/components/ArchivedContent';
@@ -16,7 +16,7 @@ import {
   Globe, Sparkles, ExternalLink, X
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 
 type SortKey = 'recent' | 'photos' | 'most-visited' | 'longest';
@@ -59,7 +59,20 @@ const NAV_ITEMS: { tab: NavTab; label: string; icon: React.ReactNode }[] = [
 /* ── Year Wrap Modal ── */
 function YearWrapModal({ trips, stats, onClose }: { trips: Trip[]; stats: { countries: number; continents: number; trips: number; cities: number; photos: number; miles: number }; onClose: () => void }) {
   const [slide, setSlide] = useState(0);
+  const [animKey, setAnimKey] = useState(0);
+  const stopAudioRef = useRef<() => void>(() => {});
   const year = new Date().getFullYear() - 1;
+
+  // Chill ambient music — Fm pad (warm, nostalgic)
+  useEffect(() => {
+    stopAudioRef.current = startAmbientPad('nostalgic');
+    return () => stopAudioRef.current();
+  }, []);
+
+  function goSlide(n: number) {
+    setSlide(n);
+    setAnimKey(k => k + 1);
+  }
 
   const totalDays = trips.reduce((acc, t) =>
     acc + Math.round((new Date(t.endDate).getTime() - new Date(t.startDate).getTime()) / 86400000) + 1, 0);
@@ -71,7 +84,7 @@ function YearWrapModal({ trips, stats, onClose }: { trips: Trip[]; stats: { coun
     { bg: 'from-violet-700 to-indigo-900', label: 'Your Year in Travel', content: (
       <div className="text-center space-y-3">
         <p className="text-white/60 text-sm font-semibold uppercase tracking-widest">{year} Wrapped</p>
-        <p className="text-7xl font-extrabold text-white">{trips.length}</p>
+        <p className="text-7xl font-extrabold text-white" style={{ animation: 'wrap-number-pop 0.55s cubic-bezier(0.4,0,0.2,1) forwards' }}>{trips.length}</p>
         <p className="text-white text-2xl font-bold">trips this year</p>
         <p className="text-white/60 text-sm mt-2">You explored more of this world than most people ever will.</p>
       </div>
@@ -79,7 +92,7 @@ function YearWrapModal({ trips, stats, onClose }: { trips: Trip[]; stats: { coun
     { bg: 'from-amber-500 to-orange-700', label: 'Globe Trotter', content: (
       <div className="text-center space-y-3">
         <p className="text-white/60 text-sm font-semibold uppercase tracking-widest">Countries visited</p>
-        <p className="text-7xl font-extrabold text-white">{stats.countries}</p>
+        <p className="text-7xl font-extrabold text-white" style={{ animation: 'wrap-number-pop 0.55s cubic-bezier(0.4,0,0.2,1) forwards' }}>{stats.countries}</p>
         <div className="flex flex-wrap justify-center gap-2 mt-4">
           {countryList.map(c => <span key={c} className="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">{c}</span>)}
         </div>
@@ -89,7 +102,7 @@ function YearWrapModal({ trips, stats, onClose }: { trips: Trip[]; stats: { coun
     { bg: 'from-rose-600 to-pink-800', label: 'Photo Memories', content: (
       <div className="text-center space-y-3">
         <p className="text-white/60 text-sm font-semibold uppercase tracking-widest">You captured</p>
-        <p className="text-7xl font-extrabold text-white">{stats.photos}</p>
+        <p className="text-7xl font-extrabold text-white" style={{ animation: 'wrap-number-pop 0.55s cubic-bezier(0.4,0,0.2,1) forwards' }}>{stats.photos}</p>
         <p className="text-white text-2xl font-bold">photos</p>
         {mostPhotos && <p className="text-white/70 text-sm">Your best trip was <span className="text-white font-bold">{mostPhotos.destination}</span> with {mostPhotos.photoCount} shots.</p>}
       </div>
@@ -97,7 +110,7 @@ function YearWrapModal({ trips, stats, onClose }: { trips: Trip[]; stats: { coun
     { bg: 'from-emerald-600 to-teal-900', label: 'Distance Covered', content: (
       <div className="text-center space-y-3">
         <p className="text-white/60 text-sm font-semibold uppercase tracking-widest">Miles travelled</p>
-        <p className="text-7xl font-extrabold text-white">{stats.miles.toLocaleString()}</p>
+        <p className="text-7xl font-extrabold text-white" style={{ animation: 'wrap-number-pop 0.55s cubic-bezier(0.4,0,0.2,1) forwards' }}>{stats.miles.toLocaleString()}</p>
         <p className="text-white/70 text-sm mt-2">That&apos;s {Math.round(stats.miles / 24901)}× around the Earth.</p>
         <p className="text-white/60 text-sm">{totalDays} days spent abroad</p>
       </div>
@@ -123,27 +136,38 @@ function YearWrapModal({ trips, stats, onClose }: { trips: Trip[]; stats: { coun
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowRight') setSlide(i => Math.min(i + 1, slides.length - 1));
-      if (e.key === 'ArrowLeft') setSlide(i => Math.max(i - 1, 0));
+      if (e.key === 'ArrowRight') goSlide(Math.min(slide + 1, slides.length - 1));
+      if (e.key === 'ArrowLeft') goSlide(Math.max(slide - 1, 0));
     }
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose, slides.length]);
+  }, [onClose, slide, slides.length]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
       <div
-        className={`relative w-full max-w-sm rounded-3xl bg-gradient-to-br ${slides[slide].bg} p-8 min-h-[480px] flex flex-col justify-between overflow-hidden`}
+        className={`relative w-full max-w-sm rounded-3xl bg-gradient-to-br ${slides[slide].bg} p-8 min-h-[500px] flex flex-col justify-between overflow-hidden shadow-2xl`}
+        style={{ animation: 'slide-up-fade 0.45s cubic-bezier(0.4,0,0.2,1) forwards' }}
         onClick={e => e.stopPropagation()}
       >
         {/* Shimmer overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/8 to-transparent pointer-events-none" />
+        {/* Subtle particle glow */}
+        <div className="absolute -top-20 -right-20 w-56 h-56 rounded-full bg-white/5 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-white/5 blur-3xl pointer-events-none" />
 
-        {/* Progress bars */}
+        {/* Progress bars — animated timer */}
         <div className="flex gap-1 mb-6">
           {slides.map((_, i) => (
-            <div key={i} className="flex-1 h-0.5 bg-white/20 rounded-full overflow-hidden cursor-pointer" onClick={() => setSlide(i)}>
-              <div className={`h-full bg-white rounded-full transition-all duration-300 ${i <= slide ? 'w-full' : 'w-0'}`} />
+            <div key={i} className="flex-1 h-[3px] bg-white/20 rounded-full overflow-hidden cursor-pointer" onClick={() => goSlide(i)}>
+              {i < slide && <div className="h-full w-full bg-white" />}
+              {i === slide && (
+                <div
+                  key={`wrap-bar-${animKey}`}
+                  className="h-full bg-white rounded-full origin-left"
+                  style={{ animation: 'story-progress 6s linear forwards' }}
+                />
+              )}
             </div>
           ))}
         </div>
@@ -153,21 +177,25 @@ function YearWrapModal({ trips, stats, onClose }: { trips: Trip[]; stats: { coun
           <X className="w-4 h-4" />
         </button>
 
-        {/* Slide content */}
-        <div className="flex-1 flex items-center justify-center py-4">
+        {/* Slide content — re-animates on slide change */}
+        <div
+          key={animKey}
+          className="flex-1 flex items-center justify-center py-4"
+          style={{ animation: 'slide-up-fade 0.4s cubic-bezier(0.4,0,0.2,1) forwards' }}
+        >
           {slides[slide].content}
         </div>
 
         {/* Nav */}
         <div className="flex items-center justify-between mt-4">
           <button
-            onClick={() => setSlide(i => Math.max(i - 1, 0))}
+            onClick={() => goSlide(Math.max(slide - 1, 0))}
             disabled={slide === 0}
             className="text-white/50 hover:text-white disabled:opacity-20 transition-colors text-sm font-semibold"
           >← Back</button>
           <p className="text-white/40 text-xs">{slide + 1} / {slides.length}</p>
           {slide < slides.length - 1
-            ? <button onClick={() => setSlide(i => i + 1)} className="text-white font-semibold text-sm hover:text-white/80 transition-colors">Next →</button>
+            ? <button onClick={() => goSlide(slide + 1)} className="text-white font-semibold text-sm hover:text-white/80 transition-colors">Next →</button>
             : <button onClick={onClose} className="bg-white text-[#171717] font-bold text-sm px-4 py-1.5 rounded-full hover:bg-white/90 transition-colors">Done</button>
           }
         </div>

@@ -126,3 +126,19 @@ body {
   60%  { transform: translateX(200%); }
   100% { transform: translateX(200%); }
 }
+
+@keyframes story-progress {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+@keyframes slide-up-fade {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+@keyframes wrap-number-pop {
+  0%   { opacity: 0; transform: scale(0.4); }
+  70%  { transform: scale(1.12); }
+  100% { opacity: 1; transform: scale(1); }
+}
