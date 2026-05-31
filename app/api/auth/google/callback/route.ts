@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { encryptSession } from '@/lib/session';
+import { getAppUrl } from '@/lib/appUrl';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const appUrl = getAppUrl();
 
   if (!code) {
     return NextResponse.redirect(`${appUrl}/home?error=no_code`);
