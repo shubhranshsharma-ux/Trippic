@@ -3,7 +3,8 @@
 import { useTrips } from '@/lib/tripsContext';
 import { Photo } from '@/lib/types';
 import Lightbox from '@/components/Lightbox';
-import { ArrowLeft, Camera, Calendar, MapPin, Sparkles, MoreVertical, Trash2, ImageIcon, Pencil, Check, X, Heart, Clock, Archive } from 'lucide-react';
+import { ArrowLeft, Camera, Calendar, MapPin, Sparkles, MoreVertical, Trash2, ImageIcon, Pencil, Check, X, Heart, Clock, Archive, BarChart2 } from 'lucide-react';
+import TripStatsPanel from '@/components/TripStatsPanel';
 import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
@@ -173,6 +174,7 @@ export default function TripDetailPage() {
   const trip = trips.find(t => t.id === id);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [statsOpen, setStatsOpen] = useState(false);
 
   if (!trip) {
     return (
@@ -199,6 +201,12 @@ export default function TripDetailPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <button onClick={() => router.push('/home')} className="btn-back absolute top-5 left-5">
           <ArrowLeft className="w-4 h-4" /> Back to trips
+        </button>
+        <button
+          onClick={() => setStatsOpen(true)}
+          className="btn-back absolute top-5 right-5 flex items-center gap-1.5"
+        >
+          <BarChart2 className="w-4 h-4" /> Trip stats
         </button>
         <div className="absolute bottom-6 left-6 right-6">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">{trip.destination}</h1>
@@ -253,6 +261,7 @@ export default function TripDetailPage() {
       {lightboxOpen && (
         <Lightbox photos={allPhotos} initialIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />
       )}
+      {statsOpen && <TripStatsPanel trip={trip} onClose={() => setStatsOpen(false)} />}
     </div>
   );
 }

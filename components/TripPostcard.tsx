@@ -2,10 +2,11 @@
 
 import { Trip } from '@/lib/types';
 import { useTrips } from '@/lib/tripsContext';
-import { Camera, Heart, MoreVertical, Trash2, Archive } from 'lucide-react';
+import { Camera, Heart, MoreVertical, Trash2, Archive, BarChart2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
+import TripStatsPanel from '@/components/TripStatsPanel';
 
 interface Props { trip: Trip; featured?: boolean; }
 
@@ -33,6 +34,7 @@ export default function TripPostcard({ trip, featured = false }: Props) {
   const { toggleFavourite, deleteTrip, toggleArchiveTrip, archivedTripIds } = useTrips();
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const isArchived = archivedTripIds.includes(trip.id);
   const tripType = inferTripType(trip);
@@ -88,6 +90,10 @@ export default function TripPostcard({ trip, featured = false }: Props) {
             </button>
             {menuOpen && (
               <div className="absolute right-0 top-10 bg-white rounded-xl shadow-xl border border-[#E5E5E5] py-1 w-40 z-30">
+                <button onClick={e => { e.stopPropagation(); setStatsOpen(true); setMenuOpen(false); }}
+                  className="w-full text-left px-3 py-2 text-xs text-[#171717] hover:bg-[#F5F5F5] flex items-center gap-2">
+                  <BarChart2 className="w-3.5 h-3.5 text-[#737373]" />Trip stats
+                </button>
                 <button onClick={e => { e.stopPropagation(); toggleArchiveTrip(trip.id); setMenuOpen(false); }}
                   className="w-full text-left px-3 py-2 text-xs text-[#171717] hover:bg-[#F5F5F5] flex items-center gap-2">
                   <Archive className="w-3.5 h-3.5 text-[#737373]" />{isArchived ? 'Unarchive' : 'Archive trip'}
@@ -131,6 +137,7 @@ export default function TripPostcard({ trip, featured = false }: Props) {
             <span className="bg-white/10 text-white/80 text-[10px] font-semibold px-2 py-0.5 rounded-full">{tripType}</span>
           </div>
         </div>
+      {statsOpen && <TripStatsPanel trip={trip} onClose={() => setStatsOpen(false)} />}
       </div>
     );
   }
@@ -174,6 +181,10 @@ export default function TripPostcard({ trip, featured = false }: Props) {
             </button>
             {menuOpen && (
               <div className="absolute right-0 top-8 bg-white rounded-xl shadow-xl border border-[#E5E5E5] py-1 w-40 z-30">
+                <button onClick={e => { e.stopPropagation(); setStatsOpen(true); setMenuOpen(false); }}
+                  className="w-full text-left px-3 py-2 text-xs text-[#171717] hover:bg-[#F5F5F5] flex items-center gap-2">
+                  <BarChart2 className="w-3.5 h-3.5 text-[#737373]" />Trip stats
+                </button>
                 <button onClick={e => { e.stopPropagation(); toggleArchiveTrip(trip.id); setMenuOpen(false); }}
                   className="w-full text-left px-3 py-2 text-xs text-[#171717] hover:bg-[#F5F5F5] flex items-center gap-2">
                   <Archive className="w-3.5 h-3.5 text-[#737373]" />{isArchived ? 'Unarchive' : 'Archive trip'}
@@ -205,6 +216,7 @@ export default function TripPostcard({ trip, featured = false }: Props) {
           </span>
         </div>
       </div>
+      {statsOpen && <TripStatsPanel trip={trip} onClose={() => setStatsOpen(false)} />}
     </div>
   );
 }

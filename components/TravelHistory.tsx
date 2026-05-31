@@ -2,6 +2,7 @@
 
 import { useTrips } from '@/lib/tripsContext';
 import Image from 'next/image';
+import { Sun, Sunset, Moon, Sunrise } from 'lucide-react';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -64,6 +65,24 @@ export default function TravelHistory() {
   const photoBarTrips = [...trips].sort((a, b) => b.photoCount - a.photoCount).slice(0, 8);
   const maxPhotoCount = photoBarTrips[0]?.photoCount || 1;
 
+  // aggregate time-of-day across all trips
+  const aggTod = { morning: 0, afternoon: 0, evening: 0, night: 0 };
+  trips.forEach(t => t.days.forEach(d => d.photos.forEach(p => {
+    if (!p.takenAt) return;
+    const h = new Date(p.takenAt).getHours();
+    if (h >= 5  && h < 12) aggTod.morning++;
+    else if (h >= 12 && h < 17) aggTod.afternoon++;
+    else if (h >= 17 && h < 21) aggTod.evening++;
+    else aggTod.night++;
+  })));
+  const aggTodTotal = aggTod.morning + aggTod.afternoon + aggTod.evening + aggTod.night || 1;
+  const aggTodRows = [
+    { label: 'Morning',   val: aggTod.morning },
+    { label: 'Afternoon', val: aggTod.afternoon },
+    { label: 'Evening',   val: aggTod.evening },
+    { label: 'Night',     val: aggTod.night },
+  ];
+
   return (
     <div className="space-y-4">
 
@@ -71,6 +90,58 @@ export default function TravelHistory() {
       <div>
         <h2 className="section-title">Travel History</h2>
         <p className="text-sm text-[#737373] mt-0.5">Your journeys, visualised.</p>
+      </div>
+
+      {/* ── Dark aggregate stats panel ── */}
+      <div className="bg-[#1a1a1a] rounded-2xl p-5 space-y-4">
+        {/* Stat tiles */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {[
+            { label: 'Photos',       value: totalPhotos.toLocaleString() },
+            { label: 'Trips',        value: totalTrips },
+            { label: 'Days abroad',  value: totalDays },
+            { label: 'Countries',    value: totalCountries },
+          ].map(({ label, value }) => (
+            <div key={label} className="bg-[#2a2a2a] rounded-xl p-3 flex flex-col gap-1">
+              <span className="text-[11px] text-white/50 font-semibold uppercase tracking-wide">{label}</span>
+              <span className="text-2xl font-extrabold text-white leading-none">{value}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Charts row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Trips per year sparkline */}
+          <div className="bg-[#2a2a2a] rounded-xl p-4">
+            <p className="text-white font-bold text-sm mb-3">Trips per year</p>
+            <div className="flex items-end gap-2 h-16">
+              {yearEntries.map(([year, count]) => (
+                <div key={year} className="flex-1 flex flex-col items-center gap-1">
+                  <div
+                    className="w-full bg-[#FDE047]/80 rounded-t-sm"
+                    style={{ height: `${Math.max((count / maxYearCount) * 56, 4)}px` }}
+                  />
+                  <span className="text-[9px] text-white/40">{year}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Time of day */}
+          <div className="bg-[#2a2a2a] rounded-xl p-4">
+            <p className="text-white font-bold text-sm mb-3">When you shoot</p>
+            <div className="space-y-2">
+              {aggTodRows.map(({ label, val }) => (
+                <div key={label} className="flex items-center gap-2">
+                  <span className="text-[11px] text-white/50 w-16 flex-shrink-0">{label}</span>
+                  <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#FDE047]/70 rounded-full" style={{ width: `${(val / aggTodTotal) * 100}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* ── Dense top stats row ── */}
