@@ -18,58 +18,36 @@ interface Story {
   musicKey: 'nostalgic' | 'joyful' | 'adventure' | 'warm';
 }
 
-// ── Web Audio ambient pad ────────────────────────────────────────
+// ── Ambient theme music ──────────────────────────────────────────
 
-const CHORDS: Record<string, number[]> = {
-  nostalgic: [130.81, 155.56, 196.00, 261.63],  // Cm — wistful
-  joyful:    [130.81, 164.81, 196.00, 261.63],  // C  — bright
-  adventure: [98.00,  123.47, 146.83, 196.00],  // Gm — dynamic
-  warm:      [87.31,  110.00, 130.81, 174.61],  // Fm — warm
-};
-
-export function startAmbientPad(key: string): () => void {
+// Plays the Trippic theme track, looped with a gentle fade in/out.
+// Keeps the (key) signature for backwards compatibility with callers,
+// though every story/year-wrap now shares the same track.
+export function startAmbientPad(_key?: string): () => void {
   try {
-    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioCtx) return () => {};
-    const ctx = new AudioCtx();
-    const freqs = CHORDS[key] ?? CHORDS.joyful;
+    if (typeof Audio === 'undefined') return () => {};
+    const audio = new Audio('/trippic-theme.wav');
+    audio.loop = true;
+    audio.volume = 0;
+    audio.play().catch(() => {});
 
-    const master = ctx.createGain();
-    master.gain.setValueAtTime(0, ctx.currentTime);
-    master.gain.linearRampToValueAtTime(0.07, ctx.currentTime + 1.8);
-
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 900;
-    master.connect(filter);
-    filter.connect(ctx.destination);
-
-    // Chord oscillators — two octaves each for richness
-    [...freqs, ...freqs.map(f => f * 2)].forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      osc.type = i < freqs.length ? 'sine' : 'triangle';
-      osc.frequency.value = freq;
-      osc.detune.value = (Math.random() - 0.5) * 8;
-      const g = ctx.createGain();
-      g.gain.value = i < freqs.length ? 0.3 : 0.12;
-      osc.connect(g);
-      g.connect(master);
-      osc.start();
-    });
-
-    // Slow LFO tremolo
-    const lfo = ctx.createOscillator();
-    lfo.frequency.value = 0.35;
-    const lfoGain = ctx.createGain();
-    lfoGain.gain.value = 0.006;
-    lfo.connect(lfoGain);
-    lfoGain.connect(master.gain);
-    lfo.start();
+    // Fade in
+    const TARGET = 0.5;
+    const fadeIn = setInterval(() => {
+      audio.volume = Math.min(TARGET, audio.volume + 0.05);
+      if (audio.volume >= TARGET) clearInterval(fadeIn);
+    }, 80);
 
     return () => {
-      master.gain.cancelScheduledValues(ctx.currentTime);
-      master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.9);
-      setTimeout(() => { try { ctx.close(); } catch {} }, 1000);
+      clearInterval(fadeIn);
+      const fadeOut = setInterval(() => {
+        audio.volume = Math.max(0, audio.volume - 0.08);
+        if (audio.volume <= 0) {
+          clearInterval(fadeOut);
+          audio.pause();
+          audio.src = '';
+        }
+      }, 60);
     };
   } catch {
     return () => {};
