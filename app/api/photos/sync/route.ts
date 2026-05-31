@@ -26,7 +26,8 @@ export async function GET(request: NextRequest) {
     );
 
     if (!res.ok) {
-      return NextResponse.json({ error: 'Failed to fetch photos from Google Photos' }, { status: 502 });
+      const errBody = await res.text();
+      return NextResponse.json({ error: 'Failed to fetch photos from Google Photos', detail: errBody, status: res.status }, { status: 502 });
     }
 
     const data = await res.json() as { mediaItems?: unknown[]; nextPageToken?: string };
