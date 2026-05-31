@@ -270,6 +270,22 @@ export default function HomePage() {
     }
   }
 
+  // After Google consent the callback redirects here with ?connected=1.
+  // Automatically open the photo picker so the user can add photos.
+  const autoPickerRan = useRef(false);
+  useEffect(() => {
+    if (autoPickerRan.current || useMock) return;
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('connected') === '1') {
+      autoPickerRan.current = true;
+      // Clean the URL so a refresh doesn't re-trigger.
+      window.history.replaceState({}, '', '/home');
+      handleSyncPhotos();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [useMock]);
+
   useEffect(() => {
     if (user === null && typeof window !== 'undefined') {
       const t = setTimeout(() => { if (!localStorage.getItem('trippic_user')) router.replace('/'); }, 100);
@@ -397,39 +413,11 @@ export default function HomePage() {
             )}
 
             <div className="ml-auto flex items-center gap-2">
-              {/* Sync Google Photos */}
-              <div className="relative group">
-                <button
-                  onClick={handleSyncPhotos}
-                  disabled={syncing || useMock}
-                  title={useMock ? 'Using mock data' : 'Sync Google Photos'}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors bg-white ${
-                    useMock
-                      ? 'border-[#E5E5E5] text-[#A3A3A3] cursor-not-allowed opacity-60'
-                      : 'border-[#E5E5E5] text-[#737373] hover:border-[#FDE047] hover:text-[#171717]'
-                  }`}
-                >
-                  <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
-                  <span className="hidden sm:block">{syncing ? 'Syncing…' : 'Sync Photos'}</span>
-                </button>
-                {useMock && (
-                  <div className="absolute right-0 top-10 bg-[#171717] text-white text-xs px-2 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                    Using mock data
-                  </div>
-                )}
-              </div>
-              {/* Connect Google Photos link */}
-              {!useMock && (
-                <a
-                  href="/api/auth/google"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#E5E5E5] text-sm font-medium text-[#737373] hover:border-[#FDE047] hover:text-[#171717] transition-colors bg-white"
-                >
-                  <Camera className="w-4 h-4" />
-                  <span className="hidden md:block">Connect</span>
-                </a>
-              )}
-              {syncMsg && (
-                <span className="hidden sm:block text-xs text-[#737373] max-w-[160px] truncate">{syncMsg}</span>
+              {(syncing || syncMsg) && (
+                <span className="hidden sm:flex items-center gap-1.5 text-xs text-[#737373] max-w-[200px] truncate">
+                  {syncing && <RefreshCw className="w-3.5 h-3.5 animate-spin shrink-0" />}
+                  {syncing ? 'Importing photos…' : syncMsg}
+                </span>
               )}
               {/* Wishlist */}
               <button

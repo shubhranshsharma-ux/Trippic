@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     expiresAt: Date.now() + (tokens.expires_in ?? 3600) * 1000,
   });
 
-  const response = NextResponse.redirect(`${appUrl}/home`);
+  const response = NextResponse.redirect(`${appUrl}/home?connected=1`);
   response.cookies.set('gp_session', encrypted, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
