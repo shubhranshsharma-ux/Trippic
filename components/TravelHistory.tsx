@@ -111,6 +111,22 @@ export default function TravelHistory() {
           ))}
         </div>
 
+        {/* Trips per year sparkline */}
+        <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
+          <p className="text-[#171717] font-bold text-sm mb-3">Trips per year</p>
+          <div className="flex items-end gap-2 h-16">
+            {yearEntries.map(([year, count]) => (
+              <div key={year} className="flex-1 flex flex-col items-center gap-1">
+                <div
+                  className="w-full bg-[#FDE047] rounded-t-sm"
+                  style={{ height: `${Math.max((count / maxYearCount) * 56, 4)}px` }}
+                />
+                <span className="text-[9px] text-[#737373]">{year}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Time of day chart */}
         <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
           <p className="text-[#171717] font-bold text-sm mb-3">When you shoot</p>
