@@ -6,6 +6,7 @@ import { Camera, Heart, MoreVertical, Trash2, Archive, BarChart2 } from 'lucide-
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import TripStatsPanel from '@/components/TripStatsPanel';
 
 interface Props { trip: Trip; featured?: boolean; }
@@ -137,7 +138,7 @@ export default function TripPostcard({ trip, featured = false }: Props) {
             <span className="bg-white/10 text-white/80 text-[10px] font-semibold px-2 py-0.5 rounded-full">{tripType}</span>
           </div>
         </div>
-      {statsOpen && <TripStatsPanel trip={trip} onClose={() => setStatsOpen(false)} />}
+      {statsOpen && createPortal(<TripStatsPanel trip={trip} onClose={() => setStatsOpen(false)} />, document.body)}
       </div>
     );
   }
@@ -216,7 +217,7 @@ export default function TripPostcard({ trip, featured = false }: Props) {
           </span>
         </div>
       </div>
-      {statsOpen && <TripStatsPanel trip={trip} onClose={() => setStatsOpen(false)} />}
+      {statsOpen && createPortal(<TripStatsPanel trip={trip} onClose={() => setStatsOpen(false)} />, document.body)}
     </div>
   );
 }

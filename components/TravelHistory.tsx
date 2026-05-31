@@ -96,12 +96,13 @@ export default function TravelHistory() {
       <div className="card py-4 px-5 space-y-4">
         <p className="label-xs">Overall snapshot</p>
         {/* Stat tiles */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {[
             { label: 'Photos',       value: totalPhotos.toLocaleString() },
             { label: 'Trips',        value: totalTrips },
             { label: 'Days abroad',  value: totalDays },
             { label: 'Countries',    value: totalCountries },
+            { label: 'Cities',       value: totalCities },
           ].map(({ label, value }) => (
             <div key={label} className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-3 flex flex-col gap-1">
               <span className="text-[11px] text-[#737373] font-semibold uppercase tracking-wide">{label}</span>
@@ -110,37 +111,18 @@ export default function TravelHistory() {
           ))}
         </div>
 
-        {/* Charts row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* Trips per year sparkline */}
-          <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
-            <p className="text-[#171717] font-bold text-sm mb-3">Trips per year</p>
-            <div className="flex items-end gap-2 h-16">
-              {yearEntries.map(([year, count]) => (
-                <div key={year} className="flex-1 flex flex-col items-center gap-1">
-                  <div
-                    className="w-full bg-[#FDE047] rounded-t-sm"
-                    style={{ height: `${Math.max((count / maxYearCount) * 56, 4)}px` }}
-                  />
-                  <span className="text-[9px] text-[#737373]">{year}</span>
+        {/* Time of day chart */}
+        <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
+          <p className="text-[#171717] font-bold text-sm mb-3">When you shoot</p>
+          <div className="space-y-2">
+            {aggTodRows.map(({ label, val }) => (
+              <div key={label} className="flex items-center gap-2">
+                <span className="text-[11px] text-[#737373] w-16 flex-shrink-0">{label}</span>
+                <div className="flex-1 h-1.5 bg-[#E5E5E5] rounded-full overflow-hidden">
+                  <div className="h-full bg-[#FDE047] rounded-full" style={{ width: `${(val / aggTodTotal) * 100}%` }} />
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Time of day */}
-          <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
-            <p className="text-[#171717] font-bold text-sm mb-3">When you shoot</p>
-            <div className="space-y-2">
-              {aggTodRows.map(({ label, val }) => (
-                <div key={label} className="flex items-center gap-2">
-                  <span className="text-[11px] text-[#737373] w-16 flex-shrink-0">{label}</span>
-                  <div className="flex-1 h-1.5 bg-[#E5E5E5] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#FDE047] rounded-full" style={{ width: `${(val / aggTodTotal) * 100}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -215,25 +197,6 @@ export default function TravelHistory() {
               {new Date(mostPhotographed.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
             </p>
           </div>
-        </div>
-      </div>
-
-      {/* ── Trips by year ── */}
-      <div className="card py-4 px-5">
-        <p className="label-xs mb-3">Trips by year</p>
-        <div className="space-y-2">
-          {yearEntries.map(([year, count]) => (
-            <div key={year} className="flex items-center gap-3">
-              <span className="text-xs font-semibold text-[#171717] w-10 flex-shrink-0">{year}</span>
-              <div className="flex-1 bg-[#F5F5F5] rounded-full h-5 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-[#FDE047] flex items-center justify-end pr-2 transition-all duration-500"
-                  style={{ width: `${Math.max((count / maxYearCount) * 100, 8)}%` }}
-                />
-              </div>
-              <span className="text-xs font-bold text-[#171717] w-5 flex-shrink-0 text-right">{count}</span>
-            </div>
-          ))}
         </div>
       </div>
 
