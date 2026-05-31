@@ -11,6 +11,7 @@ interface TripsContextValue {
   archivedTripIds: string[];
   archivedPhotoIds: string[];
   addTrip: (trip: Trip) => void;
+  addTrips: (newTrips: Trip[]) => void;
   deleteTrip: (id: string) => void;
   toggleFavourite: (id: string) => void;
   togglePhotoFavourite: (photoId: string) => void;
@@ -33,6 +34,7 @@ export function TripsProvider({ children }: { children: ReactNode }) {
   const [archivedPhotoIds, setArchivedPhotoIds] = useState<string[]>([]);
 
   function addTrip(trip: Trip) { setTrips(prev => [trip, ...prev]); }
+  function addTrips(newTrips: Trip[]) { setTrips(prev => [...newTrips, ...prev]); }
   function deleteTrip(id: string) { setTrips(prev => prev.filter(t => t.id !== id)); }
   function toggleFavourite(id: string) {
     setTrips(prev => prev.map(t => t.id === id ? { ...t, isFavourite: !t.isFavourite } : t));
@@ -64,7 +66,7 @@ export function TripsProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <TripsContext.Provider value={{ trips, stats, favouritePhotoIds, archivedTripIds, archivedPhotoIds, addTrip, deleteTrip, toggleFavourite, togglePhotoFavourite, toggleArchiveTrip, toggleArchivePhoto, setHeroPhoto, deletePhoto, updateDay, useMock }}>
+    <TripsContext.Provider value={{ trips, stats, favouritePhotoIds, archivedTripIds, archivedPhotoIds, addTrip, addTrips, deleteTrip, toggleFavourite, togglePhotoFavourite, toggleArchiveTrip, toggleArchivePhoto, setHeroPhoto, deletePhoto, updateDay, useMock }}>
       {children}
     </TripsContext.Provider>
   );

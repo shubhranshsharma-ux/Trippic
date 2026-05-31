@@ -40,7 +40,8 @@ export default function SignupPage() {
   async function handleConnect() {
     setLoading(true);
     await signup({ name, email, gender, age, avatarUrl, keepLoggedIn: true }, password);
-    router.push('/home');
+    // Redirect to Google OAuth to connect Photos
+    window.location.href = '/api/auth/google';
   }
 
   const inputCls = "w-full px-4 py-3 rounded-xl border border-[#E5E5E5] bg-[#F5F5F5] text-sm text-[#171717] placeholder-[#737373] focus:outline-none focus:ring-2 focus:ring-[#FDE047] focus:bg-white transition-all";

@@ -10,39 +10,36 @@ import FavouritesContent from '@/components/FavouritesContent';
 import ArchivedContent from '@/components/ArchivedContent';
 import TravelHistory from '@/components/TravelHistory';
 import { Trip } from '@/lib/types';
+import { groupPhotosIntoTrips } from '@/lib/groupPhotosIntoTrips';
 import {
   Luggage, Search, Plus, LogOut, User, Bookmark,
   Settings, Map, Star, Archive, BarChart2, Camera, ChevronDown, SlidersHorizontal,
-  Globe, Sparkles, ExternalLink, X
+  Globe, Sparkles, ExternalLink, X, RefreshCw
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { useCountUp } from '@/lib/useCountUp';
 
-type SortKey = 'recent' | 'photos' | 'most-visited' | 'longest';
+type SortKey = 'newest' | 'oldest' | 'az' | 'za' | 'most-photos';
 type NavTab = 'trips' | 'history' | 'favourites' | 'archived';
 
 function sortTrips(trips: Trip[], key: SortKey): Trip[] {
   const copy = [...trips];
-  if (key === 'recent') return copy.sort((a, b) => b.endDate.localeCompare(a.endDate));
-  if (key === 'photos') return copy.sort((a, b) => b.photoCount - a.photoCount);
-  if (key === 'most-visited') {
-    const freq: Record<string, number> = {};
-    trips.forEach(t => { freq[t.country] = (freq[t.country] || 0) + 1; });
-    return copy.sort((a, b) => (freq[b.country] - freq[a.country]) || b.endDate.localeCompare(a.endDate));
-  }
-  if (key === 'longest') {
-    const dur = (t: Trip) => new Date(t.endDate).getTime() - new Date(t.startDate).getTime();
-    return copy.sort((a, b) => dur(b) - dur(a));
-  }
+  if (key === 'newest') return copy.sort((a, b) => b.endDate.localeCompare(a.endDate));
+  if (key === 'oldest') return copy.sort((a, b) => a.endDate.localeCompare(b.endDate));
+  if (key === 'az') return copy.sort((a, b) => a.destination.localeCompare(b.destination));
+  if (key === 'za') return copy.sort((a, b) => b.destination.localeCompare(a.destination));
+  if (key === 'most-photos') return copy.sort((a, b) => b.photoCount - a.photoCount);
   return copy;
 }
 
 const sortOptions: { key: SortKey; label: string }[] = [
-  { key: 'recent', label: 'Recent' },
-  { key: 'photos', label: 'Most photos' },
-  { key: 'most-visited', label: 'Most visited' },
-  { key: 'longest', label: 'Longest' },
+  { key: 'newest', label: 'Newest' },
+  { key: 'oldest', label: 'Oldest' },
+  { key: 'az', label: 'A→Z' },
+  { key: 'za', label: 'Z→A' },
+  { key: 'most-photos', label: 'Most Photos' },
 ];
 
 function activeFilterCount(f: Filters) {
@@ -204,19 +201,53 @@ function YearWrapModal({ trips, stats, onClose }: { trips: Trip[]; stats: { coun
   );
 }
 
+function CountUpStat({ target, label }: { target: number; label: string }) {
+  const value = useCountUp(target, 1200);
+  return (
+    <div className="flex-1 flex flex-col items-center py-1">
+      <p className="text-2xl font-extrabold text-[#171717] leading-none">{value}</p>
+      <p className="text-[10px] text-[#737373] mt-0.5 font-semibold uppercase tracking-wide">{label}</p>
+    </div>
+  );
+}
+
 export default function HomePage() {
-  const { trips, stats, archivedTripIds } = useTrips();
+  const { trips, stats, archivedTripIds, addTrips, useMock } = useTrips();
   const { user, logout } = useAuth();
   const router = useRouter();
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState<SortKey>('recent');
+  const [sort, setSort] = useState<SortKey>('newest');
   const [menuOpen, setMenuOpen] = useState(false);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const [yearWrapOpen, setYearWrapOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<NavTab>('trips');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
+
+  async function handleSyncPhotos() {
+    if (useMock) return;
+    setSyncing(true);
+    setSyncMsg('');
+    try {
+      const res = await fetch('/api/photos/sync');
+      if (res.status === 401) {
+        router.push('/api/auth/google');
+        return;
+      }
+      if (!res.ok) throw new Error('Sync failed');
+      const data = await res.json() as { mediaItems: unknown[]; count: number };
+      const newTrips = groupPhotosIntoTrips(data.mediaItems as Parameters<typeof groupPhotosIntoTrips>[0]);
+      addTrips(newTrips);
+      setSyncMsg(`Synced ${newTrips.length} trips from ${data.count} photos`);
+    } catch {
+      setSyncMsg('Sync failed. Please try again.');
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   useEffect(() => {
     if (user === null && typeof window !== 'undefined') {
@@ -345,6 +376,40 @@ export default function HomePage() {
             )}
 
             <div className="ml-auto flex items-center gap-2">
+              {/* Sync Google Photos */}
+              <div className="relative group">
+                <button
+                  onClick={handleSyncPhotos}
+                  disabled={syncing || useMock}
+                  title={useMock ? 'Using mock data' : 'Sync Google Photos'}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors bg-white ${
+                    useMock
+                      ? 'border-[#E5E5E5] text-[#A3A3A3] cursor-not-allowed opacity-60'
+                      : 'border-[#E5E5E5] text-[#737373] hover:border-[#FDE047] hover:text-[#171717]'
+                  }`}
+                >
+                  <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                  <span className="hidden sm:block">{syncing ? 'Syncing…' : 'Sync Photos'}</span>
+                </button>
+                {useMock && (
+                  <div className="absolute right-0 top-10 bg-[#171717] text-white text-xs px-2 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                    Using mock data
+                  </div>
+                )}
+              </div>
+              {/* Connect Google Photos link */}
+              {!useMock && (
+                <a
+                  href="/api/auth/google"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#E5E5E5] text-sm font-medium text-[#737373] hover:border-[#FDE047] hover:text-[#171717] transition-colors bg-white"
+                >
+                  <Camera className="w-4 h-4" />
+                  <span className="hidden md:block">Connect</span>
+                </a>
+              )}
+              {syncMsg && (
+                <span className="hidden sm:block text-xs text-[#737373] max-w-[160px] truncate">{syncMsg}</span>
+              )}
               {/* Wishlist */}
               <button
                 onClick={() => setWishlistOpen(true)}
@@ -409,19 +474,12 @@ export default function HomePage() {
                     <p className="label-xs mb-0.5">Your world so far</p>
                     <p className="text-base font-extrabold text-[#171717]">Hey {firstName}, you&apos;ve been busy ✈️</p>
                   </div>
-                  {/* 4-stat row */}
+                  {/* 4-stat row with count-up animation */}
                   <div className="flex items-stretch gap-0 divide-x divide-[#E5E5E5]">
-                    {[
-                      { val: visibleTrips.length, label: 'Trips' },
-                      { val: stats.countries, label: 'Countries' },
-                      { val: stats.cities, label: 'Cities' },
-                      { val: stats.photos, label: 'Photos' },
-                    ].map(({ val, label }) => (
-                      <div key={label} className="flex-1 flex flex-col items-center py-1">
-                        <p className="text-2xl font-extrabold text-[#171717] leading-none">{val}</p>
-                        <p className="text-[10px] text-[#737373] mt-0.5 font-semibold uppercase tracking-wide">{label}</p>
-                      </div>
-                    ))}
+                    <CountUpStat target={visibleTrips.length} label="Trips" />
+                    <CountUpStat target={stats.countries} label="Countries" />
+                    <CountUpStat target={stats.cities} label="Cities" />
+                    <CountUpStat target={stats.photos} label="Photos" />
                   </div>
                   {/* World coverage bar */}
                   <div>
@@ -448,17 +506,20 @@ export default function HomePage() {
                   {/* Sort By */}
                   <div>
                     <p className="label-xs mb-2">Sort By</p>
-                    <div className="relative">
-                      <select
-                        value={sort}
-                        onChange={e => setSort(e.target.value as SortKey)}
-                        className="appearance-none w-full pl-3 pr-7 py-2 rounded-xl bg-[#F5F5F5] border border-[#E5E5E5] text-sm text-[#171717] font-medium focus:outline-none focus:ring-2 focus:ring-[#FDE047] cursor-pointer transition-colors"
-                      >
-                        {sortOptions.map(opt => (
-                          <option key={opt.key} value={opt.key}>{opt.label}</option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#737373] pointer-events-none" />
+                    <div className="flex flex-wrap gap-1.5">
+                      {sortOptions.map(opt => (
+                        <button
+                          key={opt.key}
+                          onClick={() => setSort(opt.key)}
+                          className={`rounded-full px-3 py-1 text-sm cursor-pointer transition-colors ${
+                            sort === opt.key
+                              ? 'bg-[#FDE047] text-[#171717] font-semibold'
+                              : 'bg-[#F5F5F5] text-[#525252] hover:bg-[#E5E5E5]'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
