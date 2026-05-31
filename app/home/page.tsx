@@ -6,6 +6,7 @@ import TripPostcard from '@/components/TripPostcard';
 import { Filters, EMPTY_FILTERS, applyFilters } from '@/components/FilterPanel';
 import StoriesCarousel, { startAmbientPad } from '@/components/StoriesCarousel';
 import WishlistPanel from '@/components/WishlistPanel';
+import NewTripModal from '@/components/NewTripModal';
 import FavouritesContent from '@/components/FavouritesContent';
 import ArchivedContent from '@/components/ArchivedContent';
 import TravelHistory from '@/components/TravelHistory';
@@ -141,7 +142,7 @@ function YearWrapModal({ trips, stats, onClose }: { trips: Trip[]; stats: { coun
   }, [onClose, slide, slides.length]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
       <div
         className={`relative w-full max-w-sm rounded-3xl bg-gradient-to-br ${slides[slide].bg} p-8 min-h-[500px] flex flex-col justify-between overflow-hidden shadow-2xl`}
         style={{ animation: 'slide-up-fade 0.45s cubic-bezier(0.4,0,0.2,1) forwards' }}
@@ -221,6 +222,7 @@ export default function HomePage() {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const [yearWrapOpen, setYearWrapOpen] = useState(false);
+  const [newTripOpen, setNewTripOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<NavTab>('trips');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -353,7 +355,7 @@ export default function HomePage() {
             </div>
             <div className="min-w-0">
               <p className="text-[11px] font-extrabold text-[#171717] leading-tight">Plan your next trip</p>
-              <p className="text-[10px] text-[#737373] leading-tight mt-0.5">Book with Scapia &amp; earn travel miles</p>
+              <p className="text-[10px] text-[#737373] leading-tight mt-0.5">Use promo <span className="font-extrabold text-[#171717]">TRIPPIC200</span> for discount</p>
               <div className="flex items-center gap-1 mt-1 text-[#171717] text-[10px] font-semibold group-hover:underline">
                 Open Scapia <ExternalLink className="w-2.5 h-2.5" />
               </div>
@@ -470,7 +472,7 @@ export default function HomePage() {
         <main className="px-4 sm:px-6 py-6">
           {/* ── MY TRIPS ── */}
           {activeTab === 'trips' && (
-            <div className="space-y-5">
+            <div className="space-y-5 animate-fade-in">
               {/* Stats card + stories row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Compact stats — click to go to Travel History */}
@@ -621,9 +623,9 @@ export default function HomePage() {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {featuredTrip && <TripPostcard trip={featuredTrip} featured />}
+                      {featuredTrip && <div className="animate-slide-up"><TripPostcard trip={featuredTrip} featured /></div>}
                       {restTrips.length > 0 && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger">
                           {restTrips.map(trip => <TripPostcard key={trip.id} trip={trip} />)}
                         </div>
                       )}
@@ -636,13 +638,13 @@ export default function HomePage() {
           )}
 
           {/* ── TRAVEL HISTORY ── */}
-          {activeTab === 'history' && <TravelHistory />}
+          {activeTab === 'history' && <div className="animate-fade-in"><TravelHistory /></div>}
 
           {/* ── FAVOURITES ── */}
-          {activeTab === 'favourites' && <FavouritesContent />}
+          {activeTab === 'favourites' && <div className="animate-fade-in"><FavouritesContent /></div>}
 
           {/* ── ARCHIVED ── */}
-          {activeTab === 'archived' && <ArchivedContent />}
+          {activeTab === 'archived' && <div className="animate-fade-in"><ArchivedContent /></div>}
         </main>
       </div>
 
@@ -661,8 +663,8 @@ export default function HomePage() {
         </button>
         {/* New Trip FAB */}
         <button
-          onClick={() => router.push('/new')}
-          className="flex items-center gap-2.5 bg-[#FDE047] hover:bg-yellow-300 text-[#171717] pl-4 pr-5 py-3.5 rounded-full shadow-xl hover:shadow-2xl transition-all hover:-translate-y-0.5 font-bold text-sm"
+          onClick={() => setNewTripOpen(true)}
+          className="flex items-center gap-2.5 bg-[#FDE047] hover:bg-yellow-300 text-[#171717] pl-4 pr-5 py-3.5 rounded-full shadow-xl hover:shadow-2xl transition-all hover:-translate-y-0.5 active:translate-y-0 font-bold text-sm"
         >
           <Plus className="w-5 h-5" />
           New trip
@@ -672,6 +674,11 @@ export default function HomePage() {
       {/* Year Wrap Modal */}
       {yearWrapOpen && (
         <YearWrapModal trips={visibleTrips} stats={stats} onClose={() => setYearWrapOpen(false)} />
+      )}
+
+      {/* New Trip Modal */}
+      {newTripOpen && (
+        <NewTripModal onClose={() => setNewTripOpen(false)} />
       )}
 
       <WishlistPanel open={wishlistOpen} onClose={() => setWishlistOpen(false)} />

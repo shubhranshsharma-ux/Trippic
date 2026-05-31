@@ -18,6 +18,7 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email || !password) { setError('Please fill in all fields.'); return; }
+    if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
     setError('');
     setLoading(true);
     await login(email, password, keep);
@@ -51,7 +52,7 @@ export default function LoginPage() {
           <div>
             <label className="block text-xs font-semibold text-[#737373] mb-1.5 uppercase tracking-wider">Password</label>
             <div className="relative">
-              <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className={inputCls} />
+              <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" minLength={6} className={inputCls} />
               <button type="button" onClick={() => setShowPass(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#737373] hover:text-[#171717]">
                 {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>

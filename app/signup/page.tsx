@@ -152,7 +152,7 @@ export default function SignupPage() {
           <div>
             <label className="block label-xs mb-1.5">Set password <span className="text-red-400 normal-case font-normal">*</span></label>
             <div className="relative">
-              <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 6 characters" className={inputCls} />
+              <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 6 characters" minLength={6} className={inputCls} />
               <button type="button" onClick={() => setShowPass(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#737373] hover:text-[#171717]">
                 {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
