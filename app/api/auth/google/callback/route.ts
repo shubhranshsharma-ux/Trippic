@@ -26,7 +26,8 @@ export async function GET(request: NextRequest) {
   });
 
   if (!tokenRes.ok) {
-    return NextResponse.redirect(`${appUrl}/home?error=token_exchange_failed`);
+    const errBody = await tokenRes.text();
+    return NextResponse.redirect(`${appUrl}/home?error=token_exchange_failed&detail=${encodeURIComponent(errBody)}`);
   }
 
   const tokens = await tokenRes.json();
