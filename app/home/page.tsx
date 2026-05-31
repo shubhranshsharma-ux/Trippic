@@ -13,7 +13,7 @@ import { Trip } from '@/lib/types';
 import {
   Luggage, Search, Plus, LogOut, User, Bookmark,
   Settings, Map, Star, Archive, BarChart2, Camera, ChevronDown, SlidersHorizontal,
-  Globe, Milestone, Sparkles, ExternalLink, X
+  Globe, Sparkles, ExternalLink, X
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
@@ -243,6 +243,26 @@ export default function HomePage() {
               {item.label}
             </button>
           ))}
+
+          {/* Scapia promo — right after nav items */}
+          <a
+            href="https://www.scapia.cards/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-2.5 px-3 py-3 mt-2 rounded-xl bg-gradient-to-br from-[#FDE047]/20 to-[#FDE047]/5 border border-[#FDE047]/40 hover:border-[#FDE047] transition-colors group"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="w-7 h-7 rounded-lg bg-[#FDE047] flex items-center justify-center flex-shrink-0">
+              <Globe className="w-3.5 h-3.5 text-[#171717]" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-extrabold text-[#171717] leading-tight">Plan your next trip</p>
+              <p className="text-[10px] text-[#737373] leading-tight mt-0.5">Book with Scapia &amp; earn travel miles</p>
+              <div className="flex items-center gap-1 mt-1 text-[#171717] text-[10px] font-semibold group-hover:underline">
+                Open Scapia <ExternalLink className="w-2.5 h-2.5" />
+              </div>
+            </div>
+          </a>
         </nav>
 
         {/* Bottom actions */}
@@ -253,25 +273,6 @@ export default function HomePage() {
           <button onClick={() => { logout(); router.push('/'); }} className="nav-item hover:!text-red-500">
             <LogOut className="w-4 h-4" /> Log out
           </button>
-          {/* Scapia promo */}
-          <a
-            href="https://scapia.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-start gap-2.5 px-3 py-3 mt-3 rounded-xl bg-gradient-to-br from-[#FDE047]/20 to-[#FDE047]/5 border border-[#FDE047]/40 hover:border-[#FDE047] transition-colors group"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="w-7 h-7 rounded-lg bg-[#FDE047] flex items-center justify-center flex-shrink-0">
-              <Globe className="w-3.5 h-3.5 text-[#171717]" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] font-extrabold text-[#171717] leading-tight">Plan your next trip</p>
-              <p className="text-[10px] text-[#737373] leading-tight mt-0.5">Book with Scapia &amp; earn travel miles</p>
-              <div className="flex items-center gap-1 mt-1.5 text-[#171717] text-[10px] font-semibold group-hover:underline">
-                Open Scapia <ExternalLink className="w-2.5 h-2.5" />
-              </div>
-            </div>
-          </a>
         </div>
 
         {/* User profile chip at bottom */}
@@ -368,57 +369,44 @@ export default function HomePage() {
           {/* ── MY TRIPS ── */}
           {activeTab === 'trips' && (
             <div className="space-y-5">
-              {/* Stats infographic + stories row */}
+              {/* Stats card + stories row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Infographic stats card */}
-                <div className="card px-5 py-5 flex flex-col gap-4 overflow-hidden relative">
-                  {/* Decorative ring */}
-                  <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[#FDE047]/10 pointer-events-none" />
-                  <div className="absolute -right-4 -top-4 w-20 h-20 rounded-full bg-[#FDE047]/15 pointer-events-none" />
-
+                {/* Compact stats — click to go to Travel History */}
+                <button
+                  onClick={() => setActiveTab('history')}
+                  className="card px-5 py-4 flex flex-col gap-3 overflow-hidden relative text-left hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                >
+                  <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-[#FDE047]/10 pointer-events-none" />
                   <div>
                     <p className="label-xs mb-0.5">Your world so far</p>
-                    <h2 className="text-lg font-extrabold text-[#171717]">Hey {firstName}, you&apos;ve been busy ✈️</h2>
+                    <p className="text-base font-extrabold text-[#171717]">Hey {firstName}, you&apos;ve been busy ✈️</p>
                   </div>
-
-                  {/* Big stat */}
-                  <div className="flex items-end gap-3">
-                    <div>
-                      <p className="text-5xl font-extrabold text-[#171717] leading-none">{visibleTrips.length}</p>
-                      <p className="text-xs text-[#737373] mt-1 font-semibold">trips taken</p>
-                    </div>
-                    <div className="w-px h-10 bg-[#E5E5E5]" />
-                    <div>
-                      <p className="text-3xl font-extrabold text-[#171717] leading-none">{stats.countries}</p>
-                      <p className="text-xs text-[#737373] mt-1 font-semibold">countries</p>
-                    </div>
-                    <div className="w-px h-10 bg-[#E5E5E5]" />
-                    <div>
-                      <p className="text-3xl font-extrabold text-[#171717] leading-none">{stats.cities}</p>
-                      <p className="text-xs text-[#737373] mt-1 font-semibold">cities</p>
-                    </div>
+                  {/* 4-stat row */}
+                  <div className="flex items-stretch gap-0 divide-x divide-[#E5E5E5]">
+                    {[
+                      { val: visibleTrips.length, label: 'Trips' },
+                      { val: stats.countries, label: 'Countries' },
+                      { val: stats.cities, label: 'Cities' },
+                      { val: stats.photos, label: 'Photos' },
+                    ].map(({ val, label }) => (
+                      <div key={label} className="flex-1 flex flex-col items-center py-1">
+                        <p className="text-2xl font-extrabold text-[#171717] leading-none">{val}</p>
+                        <p className="text-[10px] text-[#737373] mt-0.5 font-semibold uppercase tracking-wide">{label}</p>
+                      </div>
+                    ))}
                   </div>
-
-                  {/* Progress bar — countries out of 195 */}
+                  {/* World coverage bar */}
                   <div>
-                    <div className="flex justify-between items-center mb-1.5">
-                      <span className="text-[11px] text-[#737373] font-semibold flex items-center gap-1"><Globe className="w-3 h-3" /> World coverage</span>
-                      <span className="text-[11px] font-extrabold text-[#171717]">{Math.round((stats.countries / 195) * 100)}%</span>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[10px] text-[#737373] font-semibold">World coverage</span>
+                      <span className="text-[10px] font-extrabold text-[#171717]">{Math.round((stats.countries / 195) * 100)}%</span>
                     </div>
-                    <div className="h-2 bg-[#F5F5F5] rounded-full overflow-hidden">
-                      <div className="h-full bg-[#FDE047] rounded-full transition-all duration-1000" style={{ width: `${Math.max((stats.countries / 195) * 100, 3)}%` }} />
+                    <div className="h-1.5 bg-[#F5F5F5] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#FDE047] rounded-full" style={{ width: `${Math.max((stats.countries / 195) * 100, 2)}%` }} />
                     </div>
-                    <p className="text-[10px] text-[#737373] mt-1">{stats.countries} of 195 countries explored</p>
+                    <p className="text-[10px] text-[#737373] mt-0.5">Tap to see full travel history →</p>
                   </div>
-
-                  {/* Continents mini-row */}
-                  <div className="flex items-center gap-2">
-                    <Milestone className="w-3.5 h-3.5 text-[#737373] flex-shrink-0" />
-                    <span className="text-xs text-[#737373]">
-                      <span className="font-extrabold text-[#171717]">{stats.continents}</span> continent{stats.continents !== 1 ? 's' : ''} · <span className="font-extrabold text-[#171717]">{stats.photos}</span> photos · <span className="font-extrabold text-[#171717]">{stats.miles.toLocaleString()}</span> miles
-                    </span>
-                  </div>
-                </div>
+                </button>
                 <StoriesCarousel />
               </div>
 
