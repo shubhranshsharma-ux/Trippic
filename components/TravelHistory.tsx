@@ -61,6 +61,9 @@ export default function TravelHistory() {
   trips.forEach(t => { monthCount[new Date(t.startDate).getMonth()]++; });
   const maxMonthCount = Math.max(...monthCount, 1);
 
+  // total km travelled (from day-level kmTravelled fields)
+  const totalKm = trips.reduce((s, t) => s + t.days.reduce((ds, d) => ds + (d.kmTravelled ?? 0), 0), 0);
+
   // photos per trip (sorted descending)
   const photoBarTrips = [...trips].sort((a, b) => b.photoCount - a.photoCount).slice(0, 8);
   const maxPhotoCount = photoBarTrips[0]?.photoCount || 1;
@@ -95,50 +98,54 @@ export default function TravelHistory() {
       {/* ── Aggregate stats panel ── */}
       <div className="card py-4 px-5 space-y-4">
         <p className="label-xs">Overall snapshot</p>
-        {/* Stat tiles */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {/* 6 stat tiles — 3 per row */}
+        <div className="grid grid-cols-3 gap-2">
           {[
-            { label: 'Photos',       value: totalPhotos.toLocaleString() },
-            { label: 'Trips',        value: totalTrips },
-            { label: 'Days abroad',  value: totalDays },
-            { label: 'Countries',    value: totalCountries },
-            { label: 'Cities',       value: totalCities },
+            { label: 'Photos',      value: totalPhotos.toLocaleString() },
+            { label: 'Trips',       value: totalTrips },
+            { label: 'Days abroad', value: totalDays },
+            { label: 'Countries',   value: totalCountries },
+            { label: 'Cities',      value: totalCities },
+            { label: 'Km travelled',value: totalKm > 0 ? totalKm.toLocaleString() : '—' },
           ].map(({ label, value }) => (
             <div key={label} className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-3 flex flex-col gap-1">
-              <span className="text-[11px] text-[#737373] font-semibold uppercase tracking-wide">{label}</span>
-              <span className="text-2xl font-extrabold text-[#171717] leading-none">{value}</span>
+              <span className="text-[10px] text-[#737373] font-semibold uppercase tracking-wide leading-tight">{label}</span>
+              <span className="text-xl font-extrabold text-[#171717] leading-none">{value}</span>
             </div>
           ))}
         </div>
 
-        {/* Trips per year sparkline */}
-        <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
-          <p className="text-[#171717] font-bold text-sm mb-3">Trips per year</p>
-          <div className="flex items-end gap-2 h-16">
-            {yearEntries.map(([year, count]) => (
-              <div key={year} className="flex-1 flex flex-col items-center gap-1">
-                <div
-                  className="w-full bg-[#FDE047] rounded-t-sm"
-                  style={{ height: `${Math.max((count / maxYearCount) * 56, 4)}px` }}
-                />
-                <span className="text-[9px] text-[#737373]">{year}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Time of day chart */}
-        <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
-          <p className="text-[#171717] font-bold text-sm mb-3">When you shoot</p>
-          <div className="space-y-2">
-            {aggTodRows.map(({ label, val }) => (
-              <div key={label} className="flex items-center gap-2">
-                <span className="text-[11px] text-[#737373] w-16 flex-shrink-0">{label}</span>
-                <div className="flex-1 h-1.5 bg-[#E5E5E5] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#FDE047] rounded-full" style={{ width: `${(val / aggTodTotal) * 100}%` }} />
+        {/* 2 chart tiles */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* Trips per year vertical bar chart */}
+          <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
+            <p className="text-[#171717] font-bold text-sm mb-3">Trips per year</p>
+            <div className="flex items-end gap-1.5 h-16">
+              {yearEntries.map(([year, count]) => (
+                <div key={year} className="flex-1 flex flex-col items-center gap-1">
+                  <div
+                    className="w-full bg-[#FDE047] rounded-t-sm"
+                    style={{ height: `${Math.max((count / maxYearCount) * 56, 4)}px` }}
+                  />
+                  <span className="text-[9px] text-[#737373] leading-none">{year}</span>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          {/* When you shoot */}
+          <div className="bg-[#F5F5F5] border border-[#E5E5E5] rounded-xl p-4">
+            <p className="text-[#171717] font-bold text-sm mb-3">When you shoot</p>
+            <div className="space-y-2">
+              {aggTodRows.map(({ label, val }) => (
+                <div key={label} className="flex items-center gap-2">
+                  <span className="text-[11px] text-[#737373] w-14 flex-shrink-0">{label}</span>
+                  <div className="flex-1 h-1.5 bg-[#E5E5E5] rounded-full overflow-hidden">
+                    <div className="h-full bg-[#FDE047] rounded-full" style={{ width: `${(val / aggTodTotal) * 100}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
