@@ -13,36 +13,32 @@ import { Trip } from '@/lib/types';
 import {
   Luggage, Search, Plus, LogOut, User, Bookmark,
   Settings, Map, Star, Archive, BarChart2, Camera, ChevronDown, SlidersHorizontal,
-  Globe, Sparkles, ExternalLink, X
+  Globe, Sparkles, ExternalLink, X, RefreshCw
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useCountUp } from '@/lib/useCountUp';
 import Image from 'next/image';
 
-type SortKey = 'recent' | 'photos' | 'most-visited' | 'longest';
+type SortKey = 'newest' | 'oldest' | 'az' | 'za' | 'most-photos';
 type NavTab = 'trips' | 'history' | 'favourites' | 'archived';
 
 function sortTrips(trips: Trip[], key: SortKey): Trip[] {
   const copy = [...trips];
-  if (key === 'recent') return copy.sort((a, b) => b.endDate.localeCompare(a.endDate));
-  if (key === 'photos') return copy.sort((a, b) => b.photoCount - a.photoCount);
-  if (key === 'most-visited') {
-    const freq: Record<string, number> = {};
-    trips.forEach(t => { freq[t.country] = (freq[t.country] || 0) + 1; });
-    return copy.sort((a, b) => (freq[b.country] - freq[a.country]) || b.endDate.localeCompare(a.endDate));
-  }
-  if (key === 'longest') {
-    const dur = (t: Trip) => new Date(t.endDate).getTime() - new Date(t.startDate).getTime();
-    return copy.sort((a, b) => dur(b) - dur(a));
-  }
+  if (key === 'newest') return copy.sort((a, b) => b.endDate.localeCompare(a.endDate));
+  if (key === 'oldest') return copy.sort((a, b) => a.endDate.localeCompare(b.endDate));
+  if (key === 'az') return copy.sort((a, b) => a.destination.localeCompare(b.destination));
+  if (key === 'za') return copy.sort((a, b) => b.destination.localeCompare(a.destination));
+  if (key === 'most-photos') return copy.sort((a, b) => b.photoCount - a.photoCount);
   return copy;
 }
 
 const sortOptions: { key: SortKey; label: string }[] = [
-  { key: 'recent', label: 'Recent' },
-  { key: 'photos', label: 'Most photos' },
-  { key: 'most-visited', label: 'Most visited' },
-  { key: 'longest', label: 'Longest' },
+  { key: 'newest', label: 'Newest' },
+  { key: 'oldest', label: 'Oldest' },
+  { key: 'az', label: 'A→Z' },
+  { key: 'za', label: 'Z→A' },
+  { key: 'most-photos', label: 'Most Photos' },
 ];
 
 function activeFilterCount(f: Filters) {
@@ -204,12 +200,22 @@ function YearWrapModal({ trips, stats, onClose }: { trips: Trip[]; stats: { coun
   );
 }
 
+function CountUpStat({ target, label }: { target: number; label: string }) {
+  const value = useCountUp(target, 1200);
+  return (
+    <div className="flex-1 flex flex-col items-center py-1">
+      <p className="text-2xl font-extrabold text-[#171717] leading-none">{value}</p>
+      <p className="text-[10px] text-[#737373] mt-0.5 font-semibold uppercase tracking-wide">{label}</p>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const { trips, stats, archivedTripIds } = useTrips();
   const { user, logout } = useAuth();
   const router = useRouter();
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState<SortKey>('recent');
+  const [sort, setSort] = useState<SortKey>('newest');
   const [menuOpen, setMenuOpen] = useState(false);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [wishlistOpen, setWishlistOpen] = useState(false);
@@ -411,17 +417,10 @@ export default function HomePage() {
                   </div>
                   {/* 4-stat row */}
                   <div className="flex items-stretch gap-0 divide-x divide-[#E5E5E5]">
-                    {[
-                      { val: visibleTrips.length, label: 'Trips' },
-                      { val: stats.countries, label: 'Countries' },
-                      { val: stats.cities, label: 'Cities' },
-                      { val: stats.photos, label: 'Photos' },
-                    ].map(({ val, label }) => (
-                      <div key={label} className="flex-1 flex flex-col items-center py-1">
-                        <p className="text-2xl font-extrabold text-[#171717] leading-none">{val}</p>
-                        <p className="text-[10px] text-[#737373] mt-0.5 font-semibold uppercase tracking-wide">{label}</p>
-                      </div>
-                    ))}
+                    <CountUpStat target={visibleTrips.length} label="Trips" />
+                    <CountUpStat target={stats.countries} label="Countries" />
+                    <CountUpStat target={stats.cities} label="Cities" />
+                    <CountUpStat target={stats.photos} label="Photos" />
                   </div>
                   {/* World coverage bar */}
                   <div>
@@ -448,17 +447,20 @@ export default function HomePage() {
                   {/* Sort By */}
                   <div>
                     <p className="label-xs mb-2">Sort By</p>
-                    <div className="relative">
-                      <select
-                        value={sort}
-                        onChange={e => setSort(e.target.value as SortKey)}
-                        className="appearance-none w-full pl-3 pr-7 py-2 rounded-xl bg-[#F5F5F5] border border-[#E5E5E5] text-sm text-[#171717] font-medium focus:outline-none focus:ring-2 focus:ring-[#FDE047] cursor-pointer transition-colors"
-                      >
-                        {sortOptions.map(opt => (
-                          <option key={opt.key} value={opt.key}>{opt.label}</option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#737373] pointer-events-none" />
+                    <div className="flex flex-wrap gap-1.5">
+                      {sortOptions.map(opt => (
+                        <button
+                          key={opt.key}
+                          onClick={() => setSort(opt.key)}
+                          className={`rounded-full px-3 py-1 text-sm cursor-pointer transition-colors ${
+                            sort === opt.key
+                              ? 'bg-[#FDE047] text-[#171717] font-semibold'
+                              : 'bg-[#F5F5F5] text-[#525252] hover:bg-[#E5E5E5]'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
