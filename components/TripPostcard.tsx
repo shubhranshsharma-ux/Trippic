@@ -32,13 +32,20 @@ function inferTripType(t: Trip): string {
 
 export default function TripPostcard({ trip, featured = false }: Props) {
   const router = useRouter();
-  const { toggleFavourite, deleteTrip, toggleArchiveTrip, archivedTripIds } = useTrips();
+  const { toggleFavourite, deleteTrip, toggleArchiveTrip, archivedTripIds, archivedPhotoIds } = useTrips();
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const isArchived = archivedTripIds.includes(trip.id);
   const tripType = inferTripType(trip);
+
+  // Reflect archived photos in the card: adjust count and avoid an archived hero.
+  const visiblePhotos = trip.days.flatMap(d => d.photos).filter(p => !archivedPhotoIds.includes(p.id));
+  const visiblePhotoCount = visiblePhotos.length;
+  const heroUrl = archivedPhotoIds.length && visiblePhotos.length
+    ? (visiblePhotos.find(p => p.url === trip.heroPhotoUrl)?.url ?? visiblePhotos[0].url)
+    : trip.heroPhotoUrl;
 
   useEffect(() => {
     function h(e: MouseEvent) { if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false); }
@@ -62,7 +69,7 @@ export default function TripPostcard({ trip, featured = false }: Props) {
         className="group cursor-pointer relative h-80 sm:h-96 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
       >
         <Image
-          src={trip.heroPhotoUrl}
+          src={heroUrl}
           alt={trip.destination}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -130,7 +137,7 @@ export default function TripPostcard({ trip, featured = false }: Props) {
           {/* Meta row */}
           <div className="flex items-center gap-2 mt-2">
             <span className="flex items-center gap-1 text-white/55 text-[11px] font-medium">
-              <Camera className="w-3 h-3" />{trip.photoCount}
+              <Camera className="w-3 h-3" />{visiblePhotoCount}
             </span>
             <span className="text-white/30">·</span>
             <span className="text-white/55 text-[11px] font-medium">{formatDateRange(trip.startDate, trip.endDate)}</span>
@@ -151,7 +158,7 @@ export default function TripPostcard({ trip, featured = false }: Props) {
     >
       <div className="relative h-44 overflow-hidden bg-[#F5F5F5]">
         <Image
-          src={trip.heroPhotoUrl}
+          src={heroUrl}
           alt={trip.destination}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -161,7 +168,7 @@ export default function TripPostcard({ trip, featured = false }: Props) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         {/* Photo count bottom-left */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1 text-white text-xs font-semibold">
-          <Camera className="w-3 h-3" />{trip.photoCount}
+          <Camera className="w-3 h-3" />{visiblePhotoCount}
         </div>
         {/* Top-right controls */}
         <div className="absolute top-2 right-2 flex gap-1.5" onClick={e => e.stopPropagation()}>

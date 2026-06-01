@@ -150,25 +150,6 @@ export default function TravelHistory() {
         </div>
       </div>
 
-      {/* ── Dense top stats row ── */}
-      <div className="card py-4 px-5">
-        <p className="label-xs mb-3">At a glance</p>
-        <div className="flex flex-wrap gap-x-6 gap-y-3">
-          {[
-            { value: totalTrips, label: 'Trips' },
-            { value: totalCountries, label: 'Countries' },
-            { value: totalCities, label: 'Cities' },
-            { value: totalDays, label: 'Days abroad' },
-            { value: totalPhotos.toLocaleString(), label: 'Photos' },
-          ].map(({ value, label }) => (
-            <div key={label} className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-extrabold text-[#171717] leading-none">{value}</span>
-              <span className="text-xs text-[#737373] font-semibold uppercase tracking-wide">{label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* ── Two-column highlights ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 

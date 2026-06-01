@@ -1,9 +1,10 @@
 'use client';
 
 import { useTrips } from '@/lib/tripsContext';
-import { Sparkles, ChevronLeft, ChevronRight, Calendar, Users, Star, Compass, X } from 'lucide-react';
+import { Sparkles, ChevronLeft, ChevronRight, Calendar, Users, Star, Compass, X, Volume2, VolumeX } from 'lucide-react';
 import Image from 'next/image';
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Story {
   id: string;
@@ -20,12 +21,17 @@ interface Story {
 
 // ── Ambient theme music ──────────────────────────────────────────
 
+// A stop function with an attached setMuted control.
+export type AmbientController = (() => void) & { setMuted: (m: boolean) => void };
+
 // Plays the Trippic theme track, looped with a gentle fade in/out.
 // Keeps the (key) signature for backwards compatibility with callers,
 // though every story/year-wrap now shares the same track.
-export function startAmbientPad(_key?: string): () => void {
+export function startAmbientPad(_key?: string): AmbientController {
+  const noop = (() => {}) as AmbientController;
+  noop.setMuted = () => {};
   try {
-    if (typeof Audio === 'undefined') return () => {};
+    if (typeof Audio === 'undefined') return noop;
     const audio = new Audio('/trippic-theme.wav');
     audio.loop = true;
     audio.volume = 0;
@@ -38,7 +44,7 @@ export function startAmbientPad(_key?: string): () => void {
       if (audio.volume >= TARGET) clearInterval(fadeIn);
     }, 80);
 
-    return () => {
+    const stop = (() => {
       clearInterval(fadeIn);
       const fadeOut = setInterval(() => {
         audio.volume = Math.max(0, audio.volume - 0.08);
@@ -48,9 +54,11 @@ export function startAmbientPad(_key?: string): () => void {
           audio.src = '';
         }
       }, 60);
-    };
+    }) as AmbientController;
+    stop.setMuted = (m: boolean) => { audio.muted = m; };
+    return stop;
   } catch {
-    return () => {};
+    return noop;
   }
 }
 
@@ -61,12 +69,18 @@ const SLIDE_MS = 3500;
 function StoryModal({ story, onClose }: { story: Story; onClose: () => void }) {
   const [slide, setSlide] = useState(0);
   const photos = story.photos.length > 0 ? story.photos : [story.imageUrl];
-  const stopRef = useRef<() => void>(() => {});
+  const [muted, setMuted] = useState(false);
+  const stopRef = useRef<AmbientController>((() => {}) as AmbientController);
 
   useEffect(() => {
-    stopRef.current = startAmbientPad(story.musicKey);
-    return () => stopRef.current();
+    const controller = startAmbientPad(story.musicKey);
+    controller.setMuted(muted);
+    stopRef.current = controller;
+    return () => controller();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [story.musicKey]);
+
+  useEffect(() => { stopRef.current.setMuted(muted); }, [muted]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -83,8 +97,8 @@ function StoryModal({ story, onClose }: { story: Story; onClose: () => void }) {
     return () => clearTimeout(t);
   }, [slide, photos.length]);
 
-  return (
-    <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center" onClick={onClose}>
+  return createPortal((
+    <div className="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center animate-fade-in" onClick={onClose}>
       <div className="relative w-full max-w-2xl mx-4" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between mb-4 px-1">
@@ -97,9 +111,15 @@ function StoryModal({ story, onClose }: { story: Story; onClose: () => void }) {
             <h2 className="text-white font-extrabold text-xl">{story.title}</h2>
             <p className="text-white/60 text-sm mt-0.5">{story.subtitle}</p>
           </div>
-          <button onClick={onClose} className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors flex-shrink-0">
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button onClick={() => setMuted(m => !m)} title={muted ? 'Unmute' : 'Mute'}
+              className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
+              {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            </button>
+            <button onClick={onClose} className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Photo + timer */}
@@ -149,7 +169,7 @@ function StoryModal({ story, onClose }: { story: Story; onClose: () => void }) {
         </div>
       </div>
     </div>
-  );
+  ), document.body);
 }
 
 // ── Carousel ─────────────────────────────────────────────────────

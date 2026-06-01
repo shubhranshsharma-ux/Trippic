@@ -169,7 +169,7 @@ function PhotoCard({ photo, tripId, onOpen }: PhotoCardProps) {
 
 export default function TripDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { trips } = useTrips();
+  const { trips, archivedPhotoIds } = useTrips();
   const router = useRouter();
   const trip = trips.find(t => t.id === id);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -187,7 +187,12 @@ export default function TripDetailPage() {
     );
   }
 
-  const allPhotos: Photo[] = trip.days.flatMap(d => d.photos);
+  // Hide archived photos from the trip view (they live in the Archived tab).
+  const visibleDays = trip.days
+    .map(d => ({ ...d, photos: d.photos.filter(p => !archivedPhotoIds.includes(p.id)) }))
+    .filter(d => d.photos.length > 0);
+  const allPhotos: Photo[] = visibleDays.flatMap(d => d.photos);
+  const visiblePhotoCount = allPhotos.length;
   function openLightbox(photo: Photo) {
     const idx = allPhotos.findIndex(p => p.id === photo.id);
     setLightboxIndex(idx >= 0 ? idx : 0);
@@ -213,7 +218,7 @@ export default function TripDetailPage() {
           <div className="flex flex-wrap items-center gap-3 text-white/80 text-sm font-medium">
             <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" />{formatFullDate(trip.startDate)} – {formatFullDate(trip.endDate)}</span>
             <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{tripDuration(trip.startDate, trip.endDate)}</span>
-            <span className="flex items-center gap-1.5"><Camera className="w-3.5 h-3.5" />{trip.photoCount} photos</span>
+            <span className="flex items-center gap-1.5"><Camera className="w-3.5 h-3.5" />{visiblePhotoCount} photos</span>
           </div>
         </div>
       </div>
@@ -227,7 +232,7 @@ export default function TripDetailPage() {
           <p className="text-[#737373] leading-relaxed">{trip.aiSummary}</p>
         </div>
 
-        {trip.days.map((day, dayIdx) => {
+        {visibleDays.map((day, dayIdx) => {
           const date = new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
           return (
             <div key={day.date}>

@@ -4,7 +4,7 @@ import { useTrips } from '@/lib/tripsContext';
 import { useAuth } from '@/lib/authContext';
 import TripPostcard from '@/components/TripPostcard';
 import { Filters, EMPTY_FILTERS, applyFilters } from '@/components/FilterPanel';
-import StoriesCarousel, { startAmbientPad } from '@/components/StoriesCarousel';
+import StoriesCarousel, { startAmbientPad, type AmbientController } from '@/components/StoriesCarousel';
 import WishlistPanel from '@/components/WishlistPanel';
 import NewTripModal from '@/components/NewTripModal';
 import FavouritesContent from '@/components/FavouritesContent';
@@ -15,7 +15,7 @@ import { groupPhotosIntoTrips } from '@/lib/groupPhotosIntoTrips';
 import {
   Luggage, Search, Plus, LogOut, User, Bookmark,
   Settings, Map, Star, Archive, BarChart2, Camera, ChevronDown, SlidersHorizontal,
-  Globe, Sparkles, ExternalLink, X, RefreshCw
+  Globe, Sparkles, ExternalLink, X, RefreshCw, Volume2, VolumeX
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -58,14 +58,18 @@ const NAV_ITEMS: { tab: NavTab; label: string; icon: React.ReactNode }[] = [
 function YearWrapModal({ trips, stats, onClose }: { trips: Trip[]; stats: { countries: number; continents: number; trips: number; cities: number; photos: number; miles: number }; onClose: () => void }) {
   const [slide, setSlide] = useState(0);
   const [animKey, setAnimKey] = useState(0);
-  const stopAudioRef = useRef<() => void>(() => {});
+  const [muted, setMuted] = useState(false);
+  const stopAudioRef = useRef<AmbientController>((() => {}) as AmbientController);
   const year = new Date().getFullYear() - 1;
 
-  // Chill ambient music — Fm pad (warm, nostalgic)
+  // Chill ambient theme music
   useEffect(() => {
-    stopAudioRef.current = startAmbientPad('nostalgic');
-    return () => stopAudioRef.current();
+    const controller = startAmbientPad('nostalgic');
+    stopAudioRef.current = controller;
+    return () => controller();
   }, []);
+
+  useEffect(() => { stopAudioRef.current.setMuted(muted); }, [muted]);
 
   function goSlide(n: number) {
     setSlide(n);
@@ -171,9 +175,15 @@ function YearWrapModal({ trips, stats, onClose }: { trips: Trip[]; stats: { coun
         </div>
 
         {/* Close */}
-        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
-          <X className="w-4 h-4" />
-        </button>
+        <div className="absolute top-4 right-4 flex items-center gap-2">
+          <button onClick={() => setMuted(m => !m)} title={muted ? 'Unmute' : 'Mute'}
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
+            {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+          </button>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
         {/* Slide content — re-animates on slide change */}
         <div
